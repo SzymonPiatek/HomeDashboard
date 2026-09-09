@@ -8,6 +8,7 @@ import { useLogout } from "../api/use-logout";
 
 export function LogoutButton() {
   const logout = useLogout();
+  const label = logout.isPending ? "Wylogowywanie…" : "Wyloguj się";
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -16,7 +17,8 @@ export function LogoutButton() {
         variant="default"
         size="icon"
         className="size-11"
-        aria-label={logout.isPending ? "Wylogowywanie…" : "Wyloguj się"}
+        aria-label={label}
+        tooltip={label}
         onClick={() => logout.mutate()}
         disabled={logout.isPending}
       >

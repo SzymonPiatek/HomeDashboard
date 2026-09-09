@@ -1,57 +1,81 @@
-import type { FloorPlanDocument, Point, Wall } from "@repo/contracts/floor-plan";
+"use client";
 
-import { formatMeters, getFloorPlanBoundingBox, getWallBoundingSizeMm } from "./geometry/geometry";
+import type { FloorPlanDocument } from "@repo/contracts/floor-plan";
 
-const VIEW_PADDING_MM = 400;
-// Zapewnia widoczną siatkę nawet dla pustego dokumentu (US-2) zamiast zerowego viewBox.
-const MIN_VIEW_SIZE_MM = 2000;
+import { EditorCanvas } from "./editor/EditorCanvas";
+import { EditorToolbar } from "./editor/EditorToolbar";
+import { RoomNameForm } from "./editor/RoomNameForm";
+import { useFloorPlanEditor } from "./editor/use-floor-plan-editor";
+import { StaticFloorPlanView } from "./StaticFloorPlanView";
 
 type FloorPlanView2DProps = {
+  locationId: string;
+  levelId: string;
   document: FloorPlanDocument;
+  isEditMode: boolean;
 };
 
-function toPolygonPoints(points: readonly Point[]): string {
-  return points.map((point) => `${point.xMm},${point.yMm}`).join(" ");
+export function FloorPlanView2D({
+  locationId,
+  levelId,
+  document,
+  isEditMode,
+}: FloorPlanView2DProps) {
+  if (!isEditMode) return <StaticFloorPlanView document={document} />;
+
+  return <FloorPlanEditor locationId={locationId} levelId={levelId} document={document} />;
 }
 
-export function FloorPlanView2D({ document }: FloorPlanView2DProps) {
-  const box = getFloorPlanBoundingBox(document);
-  const width = Math.max(box.maxXMm - box.minXMm, MIN_VIEW_SIZE_MM) + VIEW_PADDING_MM * 2;
-  const height = Math.max(box.maxYMm - box.minYMm, MIN_VIEW_SIZE_MM) + VIEW_PADDING_MM * 2;
-  const viewBox = [box.minXMm - VIEW_PADDING_MM, box.minYMm - VIEW_PADDING_MM, width, height].join(
-    " ",
-  );
+function FloorPlanEditor({
+  locationId,
+  levelId,
+  document,
+}: Omit<FloorPlanView2DProps, "isEditMode">) {
+  const editor = useFloorPlanEditor(locationId, levelId, document);
 
   return (
-    <svg viewBox={viewBox} aria-label="Rzut poziomu, widok z góry" className="w-full flex-1">
-      {document.rooms.map((room) => (
-        <polygon
-          key={room.id}
-          aria-hidden="true"
-          points={toPolygonPoints(room.vertices)}
-          fill="currentColor"
-          className="text-muted/70"
+    <div className="flex flex-1 flex-col gap-3">
+      <EditorToolbar
+        tool={editor.tool}
+        onToolChange={editor.handleToolChange}
+        hasSelection={editor.selection !== null}
+        onDeleteSelection={editor.handleDeleteSelection}
+        canUndo={editor.canUndo}
+        onUndo={editor.handleUndo}
+        canRedo={editor.canRedo}
+        onRedo={editor.handleRedo}
+        isDirty={editor.isDirty}
+        isSaving={editor.isSaving}
+        onSave={editor.handleSave}
+        onDiscard={editor.handleDiscardChanges}
+      />
+      {editor.saveError ? (
+        <p role="alert" className="text-sm text-destructive">
+          {editor.saveError}
+        </p>
+      ) : null}
+      {editor.pendingRoomVertices ? (
+        <RoomNameForm
+          onConfirm={editor.handleRoomNameConfirm}
+          onCancel={editor.handleRoomNameCancel}
         />
-      ))}
-      {document.walls.map((wall, index) => (
-        <WallShape key={wall.id} wall={wall} index={index} />
-      ))}
-    </svg>
-  );
-}
-
-function WallShape({ wall, index }: { wall: Wall; index: number }) {
-  const { widthMm, depthMm } = getWallBoundingSizeMm(wall);
-  const label = `Ściana ${index + 1}, ${formatMeters(widthMm)} × ${formatMeters(depthMm)}`;
-
-  return (
-    <polygon
-      role="button"
-      tabIndex={0}
-      aria-label={label}
-      points={toPolygonPoints(wall.points)}
-      fill="currentColor"
-      className="text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-    />
+      ) : null}
+      <EditorCanvas
+        document={editor.draft}
+        tool={editor.tool}
+        selection={editor.selection}
+        wallDraftStart={editor.wallDraftStart}
+        roomDraftVertices={editor.roomDraftVertices}
+        cursorPoint={editor.cursorPoint}
+        onPointerDown={editor.handleCanvasPointerDown}
+        onPointerMove={editor.handleCanvasPointerMove}
+        onPointerUp={editor.handleCanvasPointerUp}
+        shapeHandlers={{
+          onPointerDown: editor.handleShapePointerDown,
+          onKeyDown: editor.handleShapeKeyDown,
+          onFocus: editor.handleShapeFocus,
+        }}
+      />
+    </div>
   );
 }

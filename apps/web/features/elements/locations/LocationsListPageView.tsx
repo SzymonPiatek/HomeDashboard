@@ -39,6 +39,10 @@ export function LocationsListPageView() {
     });
   }
 
+  const searchLabel =
+    openPanel === "search" ? "Ukryj wyszukiwanie lokalizacji" : "Szukaj lokalizacji";
+  const addLabel = openPanel === "add" ? "Zamknij dodawanie lokalizacji" : "Dodaj lokalizację";
+
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
@@ -50,9 +54,8 @@ export function LocationsListPageView() {
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "search"}
-            aria-label={
-              openPanel === "search" ? "Ukryj wyszukiwanie lokalizacji" : "Szukaj lokalizacji"
-            }
+            aria-label={searchLabel}
+            tooltip={searchLabel}
             onClick={() => selectPanel("search")}
           >
             <Search aria-hidden="true" />
@@ -63,7 +66,8 @@ export function LocationsListPageView() {
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "add"}
-            aria-label={openPanel === "add" ? "Zamknij dodawanie lokalizacji" : "Dodaj lokalizację"}
+            aria-label={addLabel}
+            tooltip={addLabel}
             onClick={() => selectPanel("add")}
           >
             <Plus aria-hidden="true" />

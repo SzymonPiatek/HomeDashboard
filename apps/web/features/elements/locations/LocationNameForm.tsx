@@ -39,6 +39,7 @@ export function LocationNameForm({ locationId, currentName }: LocationNameFormPr
           size="icon"
           className="size-11"
           aria-label="Zmień nazwę"
+          tooltip="Zmień nazwę"
           onClick={() => {
             setName(currentName);
             setIsEditing(true);
@@ -68,6 +69,7 @@ export function LocationNameForm({ locationId, currentName }: LocationNameFormPr
           size="icon"
           className="size-11"
           aria-label="Zapisz"
+          tooltip="Zapisz"
           disabled={updateLocation.isPending || name.trim().length === 0}
         >
           <Check aria-hidden="true" />
@@ -78,6 +80,7 @@ export function LocationNameForm({ locationId, currentName }: LocationNameFormPr
           size="icon"
           className="size-11"
           aria-label="Anuluj"
+          tooltip="Anuluj"
           onClick={() => setIsEditing(false)}
         >
           <X aria-hidden="true" />

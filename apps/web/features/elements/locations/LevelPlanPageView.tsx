@@ -28,6 +28,7 @@ export function LevelPlanPageView() {
   const deleteLevel = useDeleteLevel(locationId);
   const [mode, setMode] = useState<ViewMode>("2d");
   const [wallVisibilityMode, setWallVisibilityMode] = useState<WallVisibilityMode>("near-hidden");
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const sortedLevels = useMemo(
     () => [...(location.data?.levels ?? [])].sort((a, b) => a.order - b.order),
@@ -103,10 +104,13 @@ export function LevelPlanPageView() {
             onModeChange={setMode}
             wallVisibilityMode={wallVisibilityMode}
             onWallVisibilityModeChange={setWallVisibilityMode}
+            isEditMode={isEditMode}
+            onEditModeChange={setIsEditMode}
           />
           <ConfirmDeleteButton
             itemLabel={`poziom „${level.name}”`}
             isPending={deleteLevel.isPending}
+            error={deleteLevel.isError ? deleteLevel.error.message : null}
             onConfirm={() =>
               deleteLevel.mutate(levelId, {
                 onSuccess: () => router.push(LOCATION_ROUTES.detail(locationId)),
@@ -115,11 +119,6 @@ export function LevelPlanPageView() {
           />
         </div>
       </div>
-      {deleteLevel.isError ? (
-        <p role="alert" className="text-sm text-destructive">
-          {deleteLevel.error.message}
-        </p>
-      ) : null}
 
       {plan.data.walls.length === 0 && plan.data.rooms.length === 0 ? (
         <p className="text-muted-foreground">
@@ -127,7 +126,15 @@ export function LevelPlanPageView() {
           błąd.
         </p>
       ) : null}
-      <FloorPlanViewer document={plan.data} mode={mode} wallVisibilityMode={wallVisibilityMode} />
+      <FloorPlanViewer
+        key={levelId}
+        locationId={locationId}
+        levelId={levelId}
+        document={plan.data}
+        mode={mode}
+        wallVisibilityMode={wallVisibilityMode}
+        isEditMode={isEditMode}
+      />
     </div>
   );
 }

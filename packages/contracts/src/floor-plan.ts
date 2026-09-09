@@ -14,6 +14,11 @@ export const MIN_ROOM_VERTICES = 3;
 export const MAX_ROOM_VERTICES = 32;
 export const ROOM_NAME_MAX_LENGTH = 60;
 
+// .claude/rules/floor-plan.md — krok przyciągania do siatki jest stałą tu, nie kolumną w bazie.
+export const SNAP_GRID_MM = 50;
+export const DEFAULT_WALL_THICKNESS_MM = 200;
+export const MIN_WALL_LENGTH_MM = 200;
+
 // Jedyna jednostka w bazie, w kontrakcie i w kodzie — .claude/rules/floor-plan.md.
 const coordinateSchema = z.number().int().min(MIN_COORDINATE_MM).max(MAX_COORDINATE_MM);
 

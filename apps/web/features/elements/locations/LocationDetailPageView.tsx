@@ -66,6 +66,7 @@ export function LocationDetailPageView() {
         <ConfirmDeleteButton
           itemLabel={`lokalizację „${data.name}”`}
           isPending={deleteLocation.isPending}
+          error={deleteLocation.isError ? deleteLocation.error.message : null}
           onConfirm={() =>
             deleteLocation.mutate(locationId, {
               onSuccess: () => router.push(LOCATION_ROUTES.list),
@@ -73,11 +74,6 @@ export function LocationDetailPageView() {
           }
         />
       </div>
-      {deleteLocation.isError ? (
-        <p role="alert" className="text-sm text-destructive">
-          {deleteLocation.error.message}
-        </p>
-      ) : null}
 
       <LevelsSection locationId={locationId} levels={data.levels} />
     </div>
@@ -98,6 +94,9 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
     });
   }
 
+  const searchLabel = openPanel === "search" ? "Ukryj wyszukiwanie poziomów" : "Szukaj poziomów";
+  const addLabel = openPanel === "add" ? "Zamknij dodawanie poziomu" : "Dodaj poziom";
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
@@ -109,7 +108,8 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "search"}
-            aria-label={openPanel === "search" ? "Ukryj wyszukiwanie poziomów" : "Szukaj poziomów"}
+            aria-label={searchLabel}
+            tooltip={searchLabel}
             onClick={() => selectPanel("search")}
           >
             <Search aria-hidden="true" />
@@ -120,7 +120,8 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "add"}
-            aria-label={openPanel === "add" ? "Zamknij dodawanie poziomu" : "Dodaj poziom"}
+            aria-label={addLabel}
+            tooltip={addLabel}
             onClick={() => selectPanel("add")}
           >
             <Plus aria-hidden="true" />

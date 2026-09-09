@@ -42,6 +42,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       disabled={isDark === null}
       aria-label={label}
+      tooltip={label}
     >
       {isDark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
     </Button>

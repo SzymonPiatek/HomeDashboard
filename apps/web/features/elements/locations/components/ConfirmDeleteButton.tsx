@@ -3,6 +3,17 @@
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
 type ConfirmDeleteButtonProps = {
@@ -10,55 +21,59 @@ type ConfirmDeleteButtonProps = {
   itemLabel: string;
   onConfirm: () => void;
   isPending?: boolean;
+  error?: string | null;
 };
 
 // Usunięcie kasuje kaskadowo geometrię rzutu bez cofnięcia — wymaga jawnego
-// potwierdzenia w interfejsie (.claude/rules/locations.md). Dwuetapowy przycisk
-// zamiast modalu: prostsze, wciąż w pełni dostępne klawiaturowo. Blok potwierdzenia
-// montuje się od nowa przy zmianie stanu, więc `autoFocus` przenosi fokus bez `ref`.
-export function ConfirmDeleteButton({ itemLabel, onConfirm, isPending }: ConfirmDeleteButtonProps) {
+// potwierdzenia w interfejsie (.claude/rules/locations.md). Modal zamiast
+// rozwijanego bloku w miejscu przycisku — ten sam wymóg potwierdzenia, mniej miejsca.
+export function ConfirmDeleteButton({
+  itemLabel,
+  onConfirm,
+  isPending,
+  error,
+}: ConfirmDeleteButtonProps) {
   const [isConfirming, setIsConfirming] = useState(false);
 
-  if (!isConfirming) {
-    return (
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="size-11"
-        aria-label={`Usuń ${itemLabel}`}
-        onClick={() => setIsConfirming(true)}
-      >
-        <Trash2 aria-hidden="true" />
-      </Button>
-    );
-  }
-
   return (
-    <div className="flex items-center gap-2">
-      <span role="alert" className="text-sm text-destructive">
-        Tej operacji nie da się cofnąć.
-      </span>
-      <Button
-        type="button"
-        variant="destructive"
-        className="h-11"
-        aria-label={`Potwierdź usunięcie: ${itemLabel}`}
-        autoFocus
-        disabled={isPending}
-        onClick={onConfirm}
-      >
-        {isPending ? "Usuwanie…" : "Potwierdź usunięcie"}
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        className="h-11"
-        disabled={isPending}
-        onClick={() => setIsConfirming(false)}
-      >
-        Anuluj
-      </Button>
-    </div>
+    <AlertDialog open={isConfirming} onOpenChange={setIsConfirming}>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-11"
+          aria-label={`Usuń ${itemLabel}`}
+          tooltip={`Usuń ${itemLabel}`}
+        >
+          <Trash2 aria-hidden="true" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Usunąć {itemLabel}?</AlertDialogTitle>
+          <AlertDialogDescription>Tej operacji nie da się cofnąć.</AlertDialogDescription>
+        </AlertDialogHeader>
+        {error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>Anuluj</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            aria-label={`Potwierdź usunięcie: ${itemLabel}`}
+            disabled={isPending}
+            onClick={(event) => {
+              event.preventDefault();
+              onConfirm();
+            }}
+          >
+            {isPending ? "Usuwanie…" : "Potwierdź"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
