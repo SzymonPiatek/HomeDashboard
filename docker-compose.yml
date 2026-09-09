@@ -1,0 +1,22 @@
+# Dev: wyłącznie baza — patrz .claude/rules/dev.md.
+services:
+  db:
+    image: postgres:16.4
+    restart: unless-stopped
+    env_file:
+      - envs/shared.env
+      - envs/db.env
+    ports:
+      # 5433, nie 5432 — patrz .claude/rules/dev.md.
+      - "${DB_HOST_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  db-data:
