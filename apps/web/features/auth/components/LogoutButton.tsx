@@ -1,6 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { LogOut } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 import { useLogout } from "../api/use-logout";
 
@@ -11,10 +13,12 @@ export function LogoutButton() {
     <div className="flex flex-col items-end gap-1">
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
+        className="h-11 gap-2"
         onClick={() => logout.mutate()}
         disabled={logout.isPending}
       >
+        <LogOut aria-hidden="true" className="size-4" />
         {logout.isPending ? "Wylogowywanie…" : "Wyloguj się"}
       </Button>
       {logout.isError ? (

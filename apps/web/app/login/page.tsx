@@ -1,5 +1,6 @@
-import { buttonVariants } from "@/components/ui/Button";
+import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { cn } from "@/lib/utils";
 
 type LoginPageProps = {
   searchParams: Promise<{ error?: string }>;
@@ -31,13 +32,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div className="flex flex-col gap-3">
         <a
           href="/api/auth/google/start?device=standard"
-          className={buttonVariants({ size: "default" })}
+          className={cn(buttonVariants({ size: "default" }), "h-11")}
         >
           Zaloguj się kontem Google
         </a>
         <a
           href="/api/auth/google/start?device=kiosk"
-          className={buttonVariants({ variant: "outline", size: "default" })}
+          className={cn(buttonVariants({ variant: "outline", size: "default" }), "h-11")}
         >
           Zapamiętaj to urządzenie
         </a>
