@@ -58,7 +58,7 @@ describe("LocationDetailPageView", () => {
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
 
-  it("pokazuje nazwę, stan pusty poziomów i etykiety liczone z pozycji na liście", () => {
+  it("pokazuje nazwę i poziomy jako kafelki z numerem liczonym z pozycji na liście", () => {
     useLocationMock.mockReturnValue({
       isPending: false,
       isError: false,
@@ -75,14 +75,14 @@ describe("LocationDetailPageView", () => {
     renderView();
 
     expect(screen.getByRole("heading", { name: "Mieszkanie" })).toBeInTheDocument();
-    const items = screen.getAllByRole("listitem");
-    expect(items[0]).toHaveTextContent("Poziom 1");
-    expect(items[0]).toHaveTextContent("Parter");
-    expect(items[1]).toHaveTextContent("Poziom 2");
-    expect(items[1]).toHaveTextContent("Piętro");
-
-    const levelLink = screen.getByRole("link", { name: /Poziom 1.*Parter/s });
-    expect(levelLink).toHaveAttribute("href", "/locations/loc-1/levels/lvl-1");
+    expect(screen.getByRole("link", { name: "Parter (1)" })).toHaveAttribute(
+      "href",
+      "/locations/loc-1/levels/lvl-1",
+    );
+    expect(screen.getByRole("link", { name: "Piętro (2)" })).toHaveAttribute(
+      "href",
+      "/locations/loc-1/levels/lvl-2",
+    );
   });
 
   it("wymaga potwierdzenia przed usunięciem lokalizacji i przenosi do listy po sukcesie", async () => {

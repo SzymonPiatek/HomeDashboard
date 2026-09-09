@@ -10,7 +10,7 @@ export function LocationsGridSkeleton() {
   return (
     <div
       aria-label="Ładowanie lokalizacji"
-      className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-4"
+      className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4"
     >
       {[0, 1, 2].map((key) => (
         <Skeleton key={key} aria-hidden="true" className="aspect-square w-full rounded-xl" />

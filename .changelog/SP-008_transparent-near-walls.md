@@ -18,6 +18,8 @@ więc wnętrze jest widoczne bez ręcznego obracania.
 | 2026-09-09 | `plan/three/scene.ts` | Dla każdej ściany liczony jest środek i normalna skierowana na zewnątrz najbliższego pokoju; `updateNearCameraWallVisibility` co klatkę chowa ścianę, gdy kamera stoi po jej zewnętrznej stronie. |
 | 2026-09-09 | `plan/FloorPlanView3D.tsx`, `plan/FloorPlanViewer.tsx` | Przycisk trójstanowy (wszystkie widoczne / bliskie ukryte / wszystkie ukryte) w jednym rzędzie z przełącznikiem widoku 2D/3D, widoczny tylko w widoku 3D. |
 | 2026-09-09 | `LocationsListPageView.tsx` i okolice | Poza zakresem „Po co ta zmiana" powyżej, przy okazji: lista lokalizacji dostała siatkę kafelków z ikoną (jak pulpit), nagłówek z przyciskami szukaj/dodaj (wzajemnie wykluczające się panele, szerokość max 500px, lewe wyrównanie), przycisk dodania skrócony do „Dodaj". |
+| 2026-09-09 | `LocationDetailPageView.tsx`, `components/LevelsGrid.tsx`, `components/AddLevelForm.tsx` | Ten sam zestaw zmian co w liście lokalizacji zastosowany do widoku poziomów: siatka kafelków (ikona `Layers`, numer poziomu w nawiasie zamiast placeholdera „Poziom N"), nagłówek z szukaj/dodaj. |
+| 2026-09-09 | `LocationNameForm.tsx`, `LevelNameForm.tsx`, `components/ConfirmDeleteButton.tsx` | Zmień nazwę / usuń jako ikony (ołówek, kosz) zamiast tekstu; edycja nazwy podmienia nagłówek na input tej samej wielkości w miejscu (bez przeskoku układu), z ikonami zapisu (haczyk) i anulowania (X) zamiast przycisków tekstowych. |
 
 ## Decyzje podjęte po drodze
 
