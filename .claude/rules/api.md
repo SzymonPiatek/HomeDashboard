@@ -43,6 +43,20 @@ stronicowania jest niedokończony, nawet gdy dziś rekordów jest pięć.
 - Lista ma **deterministyczną kolejność**. Sortowanie bez jednoznacznego rozstrzygnięcia
   remisów potrafi pokazać ten sam rekord na dwóch stronach i pominąć inny.
 
+### Konkretny kształt tej konwencji
+
+Ustalony przy pierwszym endpointcie listującym (SP-007, `GET /api/locations`) i obowiązujący
+każdy kolejny — mieszka w `@repo/contracts` (`pagination.ts`):
+
+- Wejście: `?limit=<1..MAX_PAGE_SIZE>&cursor=<id ostatniej pozycji poprzedniej strony>`.
+  Brak `limit` → `DEFAULT_PAGE_SIZE` (10). `limit` powyżej `MAX_PAGE_SIZE` (50) jest
+  odrzucany walidacją, nie zawężany po cichu.
+- Wyjście: `{ items: T[], nextCursor: string | null }`. `nextCursor` równy `null` znaczy
+  „to była ostatnia strona"; inny kształt (`total`, `page`, `hasMore`) jest błędem.
+- Stronicuje baza: `take`, `cursor` i `skip: 1` w Prismie, nigdy obcięcie w serwisie.
+- Zbiór będący częścią agregatu (poziomy w lokalizacji) nie jest osobną listą i nie podlega
+  tej konwencji — ogranicza go twardy limit z kontraktu (`.claude/rules/locations.md`).
+
 ## Bezpieczeństwo
 
 - Każdy endpoint jest domyślnie **chroniony**. Publiczny endpoint musi być oznaczony jawnie

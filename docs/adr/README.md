@@ -4,12 +4,14 @@ Jeden plik = jedna decyzja, wg `.claude/templates/adr.md`. Numer raz użyty nie 
 do puli; decyzję zmienia się nowym ADR-em ze zdaniem „Zastępuje ADR-NNNN", nigdy edycją
 starego.
 
-| Numer                                                         | Decyzja                                                                              | Status        |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------- |
-| [0001](0001-google-oauth-two-stage-authorization.md)          | Logowanie wyłącznie kontem Google — dwustopniowy przepływ OAuth w `apps/api`         | Zaakceptowany |
-| [0002](0002-floor-plan-normalized-entities-in-millimeters.md) | Rzut mieszkania — znormalizowane encje w milimetrach, zapisywane jako jeden dokument | Zaakceptowany |
-| [0003](0003-server-session-with-two-lifetimes.md)             | Sesja serwerowa w ciasteczku HttpOnly, dwa czasy życia (kiosk / standardowa)         | Zaakceptowany |
-| [0006](0006-floor-plan-rendered-as-svg.md)                    | Rzut mieszkania rysowany w SVG — każdy obiekt jest elementem DOM                     | Zaakceptowany |
+| Numer                                                         | Decyzja                                                                              | Status                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| [0001](0001-google-oauth-two-stage-authorization.md)          | Logowanie wyłącznie kontem Google — dwustopniowy przepływ OAuth w `apps/api`         | Zaakceptowany                                                                                                             |
+| [0002](0002-floor-plan-normalized-entities-in-millimeters.md) | Rzut mieszkania — znormalizowane encje w milimetrach, zapisywane jako jeden dokument | Częściowo zastąpiony przez [0008](0008-level-as-floor-plan-aggregate-root.md) i [0010](0010-wall-as-four-corner-block.md) |
+| [0003](0003-server-session-with-two-lifetimes.md)             | Sesja serwerowa w ciasteczku HttpOnly, dwa czasy życia (kiosk / standardowa)         | Zaakceptowany                                                                                                             |
+| [0006](0006-floor-plan-rendered-as-svg.md)                    | Rzut mieszkania rysowany w SVG — każdy obiekt jest elementem DOM                     | Zaakceptowany                                                                                                             |
+| [0008](0008-level-as-floor-plan-aggregate-root.md)            | Poziom (piętro) jest korzeniem agregatu rzutu; konto ma wiele lokalizacji            | Zaakceptowany                                                                                                             |
+| [0010](0010-wall-as-four-corner-block.md)                     | Ściana to blok o czterech jawnych rogach z własną wysokością, bez grubości           | Zaakceptowany                                                                                                             |
 
 ## Skąd nieciągłości w numeracji
 
@@ -25,3 +27,13 @@ Ta sama uwaga dotyczy odwołań do ADR-0004 i dalszych w `.claude/rules/api.md`,
 Pochodzą z projektu referencyjnego, z którego wzięto reguły; **treść reguły obowiązuje,
 numer nie ma dziś odpowiednika w tym repozytorium**. Uporządkowanie tych odwołań wymaga
 decyzji użytkownika i jest odłożone jako BL-010.
+
+Z tego samego powodu po 0008 przeskakujemy do 0010: numer **0009** zajmuje odwołanie
+z `.claude/rules/web.md` i `typescript.md` (adresy tras po angielsku, test zgodności
+rejestru z drzewem tras). ADR-0008 i ADR-0010 dostały pierwsze numery, których żadna
+reguła nie zajmuje.
+
+**Częściowe zastąpienie** oznacza, że dokument dalej obowiązuje poza wskazanym fragmentem;
+zastępujący ADR nazywa ten fragment wprost w nagłówku. Treści zastąpionego ADR-a nie
+zmieniamy — poprawiamy wyłącznie jego linię `Status`, żeby czytający nie wziął nieaktualnej
+części za obowiązującą (tak stało się w SP-005 z modelem ściany).
