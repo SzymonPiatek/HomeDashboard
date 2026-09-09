@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -12,7 +12,9 @@ import { useFloorPlan } from "./api/use-floor-plan";
 import { ConfirmDeleteButton } from "./components/ConfirmDeleteButton";
 import { LOCATION_ROUTES } from "./lib/routes";
 import { LevelNameForm } from "./LevelNameForm";
-import { FloorPlanViewer } from "./plan/FloorPlanViewer";
+import { type WallVisibilityMode } from "./plan/FloorPlanView3D";
+import { FloorPlanViewControls } from "./plan/FloorPlanViewControls";
+import { FloorPlanViewer, type ViewMode } from "./plan/FloorPlanViewer";
 
 // Strona poziomu JEST rzutem, bez segmentu /plan (.claude/rules/locations.md).
 // Identyfikatory pochodzą z trasy, bez propsów (.claude/rules/web.md). Nazwa,
@@ -24,6 +26,8 @@ export function LevelPlanPageView() {
   const location = useLocation(locationId);
   const plan = useFloorPlan(locationId, levelId);
   const deleteLevel = useDeleteLevel(locationId);
+  const [mode, setMode] = useState<ViewMode>("2d");
+  const [wallVisibilityMode, setWallVisibilityMode] = useState<WallVisibilityMode>("near-hidden");
 
   const sortedLevels = useMemo(
     () => [...(location.data?.levels ?? [])].sort((a, b) => a.order - b.order),
@@ -87,19 +91,29 @@ export function LevelPlanPageView() {
   return (
     <div className="flex flex-1 flex-col gap-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <span className="text-sm text-muted-foreground">Poziom {position}</span>
-          <LevelNameForm locationId={locationId} levelId={levelId} currentName={level.name} />
-        </div>
-        <ConfirmDeleteButton
-          itemLabel={`poziom „${level.name}”`}
-          isPending={deleteLevel.isPending}
-          onConfirm={() =>
-            deleteLevel.mutate(levelId, {
-              onSuccess: () => router.push(LOCATION_ROUTES.detail(locationId)),
-            })
-          }
+        <LevelNameForm
+          locationId={locationId}
+          levelId={levelId}
+          currentName={level.name}
+          position={position}
         />
+        <div className="flex items-center gap-2">
+          <FloorPlanViewControls
+            mode={mode}
+            onModeChange={setMode}
+            wallVisibilityMode={wallVisibilityMode}
+            onWallVisibilityModeChange={setWallVisibilityMode}
+          />
+          <ConfirmDeleteButton
+            itemLabel={`poziom „${level.name}”`}
+            isPending={deleteLevel.isPending}
+            onConfirm={() =>
+              deleteLevel.mutate(levelId, {
+                onSuccess: () => router.push(LOCATION_ROUTES.detail(locationId)),
+              })
+            }
+          />
+        </div>
       </div>
       {deleteLevel.isError ? (
         <p role="alert" className="text-sm text-destructive">
@@ -113,7 +127,7 @@ export function LevelPlanPageView() {
           błąd.
         </p>
       ) : null}
-      <FloorPlanViewer document={plan.data} />
+      <FloorPlanViewer document={plan.data} mode={mode} wallVisibilityMode={wallVisibilityMode} />
     </div>
   );
 }

@@ -20,6 +20,7 @@ więc wnętrze jest widoczne bez ręcznego obracania.
 | 2026-09-09 | `LocationsListPageView.tsx` i okolice | Poza zakresem „Po co ta zmiana" powyżej, przy okazji: lista lokalizacji dostała siatkę kafelków z ikoną (jak pulpit), nagłówek z przyciskami szukaj/dodaj (wzajemnie wykluczające się panele, szerokość max 500px, lewe wyrównanie), przycisk dodania skrócony do „Dodaj". |
 | 2026-09-09 | `LocationDetailPageView.tsx`, `components/LevelsGrid.tsx`, `components/AddLevelForm.tsx` | Ten sam zestaw zmian co w liście lokalizacji zastosowany do widoku poziomów: siatka kafelków (ikona `Layers`, numer poziomu w nawiasie zamiast placeholdera „Poziom N"), nagłówek z szukaj/dodaj. |
 | 2026-09-09 | `LocationNameForm.tsx`, `LevelNameForm.tsx`, `components/ConfirmDeleteButton.tsx` | Zmień nazwę / usuń jako ikony (ołówek, kosz) zamiast tekstu; edycja nazwy podmienia nagłówek na input tej samej wielkości w miejscu (bez przeskoku układu), z ikonami zapisu (haczyk) i anulowania (X) zamiast przycisków tekstowych. |
+| 2026-09-09 | `LevelPlanPageView.tsx`, `plan/FloorPlanViewControls.tsx` (nowy), `plan/FloorPlanViewer.tsx`, `LevelNameForm.tsx` | Placeholder „Poziom N" usunięty, numer poziomu w nawiasie obok nazwy (jak na kafelku). Przełącznik 2D/3D i widoczności ścian przeniesiony znad rysunku do nagłówka strony, obok przycisku usunięcia, jako `variant="ghost"`; `FloorPlanViewer` przestał trzymać ten stan sam i stał się komponentem sterowanym. Ikona przejścia do 2D zmieniona z `Square` na `Map` — czytelniejsza. |
 
 ## Decyzje podjęte po drodze
 

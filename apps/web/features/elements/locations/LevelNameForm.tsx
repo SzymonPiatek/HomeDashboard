@@ -13,11 +13,14 @@ type LevelNameFormProps = {
   locationId: string;
   levelId: string;
   currentName: string;
+  // Pozycja na posortowanej liście poziomów, nie `order` (.claude/rules/locations.md) —
+  // wyświetlana w nawiasie obok nazwy, tak jak na kafelku w widoku lokalizacji.
+  position: number;
 };
 
 // Nazwa poziomu jest nagłówkiem strony rzutu (h1) — edycja podmienia go w miejscu
 // na input tej samej wielkości, żeby układ strony się nie przesuwał. Wzorem LocationNameForm.
-export function LevelNameForm({ locationId, levelId, currentName }: LevelNameFormProps) {
+export function LevelNameForm({ locationId, levelId, currentName, position }: LevelNameFormProps) {
   const updateLevel = useUpdateLevel(locationId);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(currentName);
@@ -36,7 +39,9 @@ export function LevelNameForm({ locationId, levelId, currentName }: LevelNameFor
   if (!isEditing) {
     return (
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-semibold">{currentName}</h1>
+        <h1 className="text-2xl font-semibold">
+          {currentName} ({position})
+        </h1>
         <Button
           type="button"
           variant="ghost"
