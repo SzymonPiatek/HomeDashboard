@@ -1,10 +1,11 @@
+import { Building2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-import { FloorPlanPageView } from "@/features/elements/floor-plan/FloorPlanPageView";
+import { LocationsListPageView } from "@/features/elements/locations/LocationsListPageView";
 
 // Klucz jest zamkniętą listą — dodanie elementu bez wpisu w rejestrze poniżej jest
 // błędem kompilacji, nie pustym kafelkiem na produkcji (.claude/rules/web.md).
-export type ElementKey = "floor-plan";
+export type ElementKey = "locations";
 
 // Providerów jeszcze nie ma (ADR-0019 dotyczy kolejnej gałęzi) — pole zostaje jako
 // wymagane o dopuszczalnie pustej wartości, żeby pierwszy provider nie zmieniał kształtu.
@@ -15,14 +16,17 @@ type ElementDefinition = {
   path: string;
   provider: ProviderKey | null;
   page: ComponentType;
+  icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 };
 
-// Minimalna wersja na potrzeby tego spike'a — jedyny element to floor-plan.
+// Rejestr zna wyłącznie wejście do elementu — adresy wewnętrzne (lokalizacja,
+// poziom) powstają w `features/elements/locations/lib/routes.ts`.
 export const ELEMENT_REGISTRY: Record<ElementKey, ElementDefinition> = {
-  "floor-plan": {
-    label: "Rzut mieszkania",
-    path: "/floor-plan",
+  locations: {
+    label: "Lokalizacje",
+    path: "/locations",
     provider: null,
-    page: FloorPlanPageView,
+    page: LocationsListPageView,
+    icon: Building2,
   },
 };

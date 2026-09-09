@@ -4,5 +4,5 @@
     "outDir": "dist",
     "rootDir": "."
   },
-  "include": ["src/**/*.ts", "prisma.config.ts", "eslint.config.js"]
+  "include": ["src/**/*.ts", "prisma.config.ts", "prisma/**/*.ts", "eslint.config.js"]
 }

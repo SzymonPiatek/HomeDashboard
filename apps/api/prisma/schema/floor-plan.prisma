@@ -1,0 +1,61 @@
+// Geometria rzutu (ADR-0002, ADR-0010). Kolumną właściciela jest `levelId`
+// (dla RoomVertex — `roomId`); accountId istnieje wyłącznie na Location — .claude/rules/floor-plan.md.
+
+// Ściana to blok o czterech jawnych rogach, bez grubości i bez @default na heightMm
+// (wartość domyślna żyje wyłącznie w @repo/contracts) — ADR-0010.
+model Wall {
+  id      String @id @db.Uuid
+  levelId String
+
+  p1XMm Int
+  p1YMm Int
+  p2XMm Int
+  p2YMm Int
+  p3XMm Int
+  p3YMm Int
+  p4XMm Int
+  p4YMm Int
+
+  heightMm Int
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  level Level @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@index([levelId])
+  @@map("walls")
+}
+
+// Pokój jest samodzielnym wielokątem, niezależnym od ścian (ADR-0002). Id przychodzi
+// od klienta jako uuid, bez wartości domyślnej.
+model Room {
+  id      String @id @db.Uuid
+  levelId String
+  name    String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  level    Level        @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  vertices RoomVertex[]
+
+  @@index([levelId])
+  @@map("rooms")
+}
+
+model RoomVertex {
+  id       String @id @default(cuid())
+  roomId   String @db.Uuid
+  position Int
+  xMm      Int
+  yMm      Int
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, position])
+  @@map("room_vertices")
+}

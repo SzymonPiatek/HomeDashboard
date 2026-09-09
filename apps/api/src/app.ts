@@ -7,13 +7,19 @@ import { requestId } from "./http/request-id.js";
 import { createAccountRepository } from "./modules/auth/account.repository.js";
 import { createAuthRouter } from "./modules/auth/auth.route.js";
 import type { AccountRepository, SessionRepository } from "./modules/auth/auth.types.js";
+import { createRequireSession } from "./modules/auth/require-session.js";
 import { createSessionRepository } from "./modules/auth/session.repository.js";
 import { createHealthRouter } from "./modules/health/health.route.js";
+import {
+  createLocationsRouter,
+  type LocationsRouterDeps,
+} from "./modules/locations/locations.route.js";
 
 export type AppDependencies = {
   env: Env;
   accountRepository?: AccountRepository;
   sessionRepository?: SessionRepository;
+  locationsRepositories?: LocationsRouterDeps;
 };
 
 /** Prefiks /api obsługuje samo API, proxy go nie obcina — .claude/rules/auth.md. */
@@ -21,6 +27,15 @@ export function createApp(deps: AppDependencies): Express {
   const app = express();
   const accountRepository = deps.accountRepository ?? createAccountRepository();
   const sessionRepository = deps.sessionRepository ?? createSessionRepository();
+  const requireSession = createRequireSession({
+    sessionRepository,
+    ownerEmail: deps.env.OWNER_EMAIL,
+    sessionTtl: {
+      kioskDays: deps.env.SESSION_TTL_KIOSK_DAYS,
+      standardDays: deps.env.SESSION_TTL_STANDARD_DAYS,
+    },
+    cookieSecure: deps.env.COOKIE_SECURE,
+  });
 
   app.disable("x-powered-by");
   app.use(requestId);
@@ -28,6 +43,7 @@ export function createApp(deps: AppDependencies): Express {
   app.use(cookies);
   app.use("/api", createHealthRouter());
   app.use("/api/auth", createAuthRouter({ env: deps.env, accountRepository, sessionRepository }));
+  app.use("/api/locations", requireSession, createLocationsRouter(deps.locationsRepositories));
   app.use(notFoundHandler);
   app.use(errorHandler);
 

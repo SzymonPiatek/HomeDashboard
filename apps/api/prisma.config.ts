@@ -9,6 +9,8 @@ export default defineConfig({
   // Migracje osobno od plików domeny — schema/ zawiera wyłącznie *.prisma.
   migrations: {
     path: "prisma/migrations",
+    // tsx, nie ts-node — już jest devDependency (.claude/rules/dev.md).
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
     url: env("DATABASE_URL"),

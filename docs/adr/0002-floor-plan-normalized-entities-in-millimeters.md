@@ -1,6 +1,6 @@
 # ADR-0002: Rzut mieszkania — znormalizowane encje w milimetrach, zapisywane jako jeden dokument
 
-- **Status:** Zaakceptowany
+- **Status:** Zaakceptowany; **częściowo zastąpiony** — korzeń agregatu przez [ADR-0008](0008-level-as-floor-plan-aggregate-root.md), model ściany przez [ADR-0010](0010-wall-as-four-corner-block.md)
 - **Data:** 2026-09-09
 - **Dotyczy:** baza / kontrakt API / dane elementu pulpitu
 
