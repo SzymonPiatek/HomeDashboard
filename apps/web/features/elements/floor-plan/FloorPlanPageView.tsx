@@ -1,7 +1,5 @@
 import { FloorPlanViewer } from "./FloorPlanViewer";
 
-// Widok strony elementu — bez propsów; ramka strony (AuthGate, Navbar) należy
-// do powłoki obszaru w app/floor-plan/page.tsx (.claude/rules/web.md).
 export function FloorPlanPageView() {
   return (
     <div className="flex flex-1 flex-col gap-4">

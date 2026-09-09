@@ -10,8 +10,6 @@ import { FLOOR_PLAN_TEST_DATA } from "./test-data";
 
 type ViewMode = "2d" | "3d";
 
-// Trzyma stan trybu podglądu nad tymi samymi danymi testowymi — dowód spike'a,
-// że 2D (ADR-0006) i 3D renderują jeden model (ADR-0002).
 export function FloorPlanViewer() {
   const [mode, setMode] = useState<ViewMode>("2d");
   const isTwoD = mode === "2d";

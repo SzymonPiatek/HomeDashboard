@@ -1,7 +1,6 @@
 import { formatMeters, getFloorPlanBoundingBox, getWallBoundingSizeMm } from "./geometry";
 import type { FloorPlanTestData, Point, Wall } from "./types";
 
-// Margines wokół rzutu w viewBox, w tych samych mm co dane — ADR-0006.
 const VIEW_PADDING_MM = 400;
 
 type FloorPlanView2DProps = {
@@ -12,7 +11,6 @@ function toPolygonPoints(points: readonly Point[]): string {
   return points.map((point) => `${point.xMm},${point.yMm}`).join(" ");
 }
 
-// SVG, 1 jednostka = 1 mm (ADR-0006). Kolory wyłącznie przez currentColor + token motywu.
 export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
   const box = getFloorPlanBoundingBox(data);
   const viewBox = [

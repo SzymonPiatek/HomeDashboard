@@ -10,8 +10,6 @@ type FloorPlanView3DProps = {
   data: FloorPlanTestData;
 };
 
-// Widok kliencki: Three.js zarządzany ręcznie w useEffect, nad tymi samymi danymi
-// testowymi co FloorPlanView2D (dowód, że 2D i 3D czytają jeden model — ADR-0002).
 export function FloorPlanView3D({ data }: FloorPlanView3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 

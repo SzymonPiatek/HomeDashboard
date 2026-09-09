@@ -5,8 +5,6 @@ import type { BoundingBox } from "../geometry";
 import { DEFAULT_WALL_HEIGHT_MM } from "../types";
 import type { FloorPlanTestData, Room, Wall } from "../types";
 
-// mm to jedyna jednostka danych (ADR-0002); metry żyją wyłącznie w scenie Three.js,
-// żeby liczby kamery/kontrolek miały rozsądną skalę.
 export const MM_TO_M = 1 / 1000;
 
 export type Disposable = { dispose: () => void };
@@ -19,11 +17,7 @@ export type Scene3D = {
   disposables: Disposable[];
 };
 
-// Tokeny motywu są zapisane jako oklch() (packages/config/tailwind/theme.css), a
-// przeglądarka od pewnego czasu zwraca z getComputedStyle tę samą notację zamiast
-// normalizować do rgb() — a Three.js Color.setStyle() parsuje tylko rgb()/hsl()/hex,
-// więc oklch() cicho zawodzi (ostrzeżenie w konsoli, kolor zostaje domyślną bielą).
-// Rasteryzacja przez canvas 2D wymusza sRGB niezależnie od notacji wejściowej.
+// oklch() z getComputedStyle nie parsuje się w Three.Color — rasteryzujemy przez canvas.
 export function resolveCssColor(cssVariable: string): string {
   const probe = document.createElement("span");
   probe.style.color = `var(${cssVariable})`;
@@ -87,10 +81,6 @@ function addLights(scene: THREE.Scene, box: BoundingBox): void {
   scene.add(directionalLight);
 }
 
-// Ściana = wielokąt jej czterech rogów wytłoczony w pionie (ADR-0002), dokładnie
-// te same punkty co w 2D (FloorPlanView2D) — dowód, że oba widoki czytają jeden
-// model. Mapowanie mm → m i -yMm identyczne jak w buildFloorMesh, żeby ściany
-// i podłoga leżały w tej samej płaszczyźnie XZ.
 function buildWallMesh(wall: Wall, colorCss: string): { mesh: THREE.Mesh } & Disposable {
   const shape = new THREE.Shape(
     wall.points.map((point) => new THREE.Vector2(point.xMm * MM_TO_M, -point.yMm * MM_TO_M)),
@@ -111,8 +101,6 @@ function buildWallMesh(wall: Wall, colorCss: string): { mesh: THREE.Mesh } & Dis
   };
 }
 
-// Podłoga = triangulacja wielokąta pokoju (THREE.Shape), tak jak w blueprint3d,
-// z tym samym mapowaniem mm → m co ściany.
 function buildFloorMesh(room: Room, colorCss: string): { mesh: THREE.Mesh } & Disposable {
   const shape = new THREE.Shape(
     room.vertices.map((vertex) => new THREE.Vector2(vertex.xMm * MM_TO_M, -vertex.yMm * MM_TO_M)),

@@ -14,7 +14,6 @@ export const FLOOR_PLAN_TEST_DATA: FloorPlanTestData = {
     },
   ],
   walls: [
-    // Góra — pełna szerokość zewnętrzna.
     {
       id: "3f9a1c10-1111-4a11-8a11-000000000001",
       points: [
@@ -24,7 +23,6 @@ export const FLOOR_PLAN_TEST_DATA: FloorPlanTestData = {
         { xMm: 0, yMm: 200 },
       ],
     },
-    // Prawa — mieści się między górną a dolną ścianą.
     {
       id: "3f9a1c10-1111-4a11-8a11-000000000002",
       points: [
@@ -34,7 +32,6 @@ export const FLOOR_PLAN_TEST_DATA: FloorPlanTestData = {
         { xMm: 1200, yMm: 2200 },
       ],
     },
-    // Lewa — mieści się między górną a dolną ścianą.
     {
       id: "3f9a1c10-1111-4a11-8a11-000000000003",
       points: [
@@ -44,7 +41,6 @@ export const FLOOR_PLAN_TEST_DATA: FloorPlanTestData = {
         { xMm: 0, yMm: 2200 },
       ],
     },
-    // Dół — pełna szerokość zewnętrzna.
     {
       id: "3f9a1c10-1111-4a11-8a11-000000000004",
       points: [
