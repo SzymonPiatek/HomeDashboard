@@ -12,9 +12,10 @@ udowadniają, i pokrywasz to, czego żaden z nich nie widzi: całą ścieżkę.
 
 ## Zanim zaczniesz
 
-Przeczytaj `.claude/rules/testing.md` — to jest Twój dokument bazowy — oraz
-`.claude/rules/stack.md`. Jeśli oceniasz pokrycie zmiany w UI, zajrzyj też do
-`.claude/rules/web.md`.
+Przeczytaj `.claude/rules/testing.md` i `.claude/rules/testing-selectors.md` — to Twoje
+dokumenty bazowe — oraz `.claude/rules/stack.md`. Jeśli oceniasz pokrycie zmiany w UI,
+zajrzyj też do `.claude/rules/ui-quality.md` (dostępność, motywy, stany widoku — nie
+potrzebujesz reszty `web.md`, to warstwa implementacji frontendu).
 
 ## Twarde granice
 
@@ -38,7 +39,7 @@ główny scenariusz z PRD, operacje nieodwracalne (usuwanie).
 Do ścieżek krytycznych warto dołożyć **automatyczne sprawdzenie dostępności** (axe) oraz —
 tam gdzie kolor niesie znaczenie (statusy, błędy, wykresy) — przebieg w **obu motywach**.
 Naruszenie dostępności traktujesz jak błąd (WCAG 2.2 AA to wymóg produktu,
-`.claude/rules/web.md`, niezależny od tego, ile testów istnieje), nie jak ostrzeżenie.
+`.claude/rules/ui-quality.md`, niezależny od tego, ile testów istnieje), nie jak ostrzeżenie.
 Nie duplikujesz przy tym całego zestawu testów: motyw parametryzujesz tam, gdzie ma
 znaczenie.
 
@@ -62,7 +63,7 @@ await expect(page.getByRole('heading', { name: 'Twój pulpit' })).toBeVisible();
 ```
 
 - Selektory po roli i dostępnej nazwie. `data-testid` tylko w przypadkach z
-  `.claude/rules/testing.md`.
+  `.claude/rules/testing-selectors.md`.
 - Jeśli elementu nie da się znaleźć po nazwie, **zgłaszasz to jako błąd dostępności**
   do `frontend-dev` — nie obchodzisz problemu selektorem po klasie.
 - Każdy test tworzy własnego użytkownika i własne dane. Zero współdzielonego stanu.

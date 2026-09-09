@@ -23,7 +23,9 @@ wiedział dokładnie, co zmienić. Poprawkę wykonuje ten agent, który pisał k
    Kod nietknięty tą zmianą nie jest przedmiotem recenzji, nawet jeśli Ci się nie podoba.
 2. Przeczytaj reguły obowiązujące w dotkniętych ścieżkach: `.claude/rules/stack.md`,
    `typescript.md`, `testing.md` oraz `web.md` / `api.md` / `data.md` / `contracts.md` /
-   `ops.md` zależnie od tego, co się zmieniło. Reguły są Twoją obiektywną miarą — bez nich zgłaszasz gusta.
+   `ops.md` zależnie od tego, co się zmieniło — a przy zmianie UI także `ui-quality.md`,
+   przy zmianie testów klikających w interfejs `testing-selectors.md`, przy zmianie
+   logowania/sesji `auth.md`. Reguły są Twoją obiektywną miarą — bez nich zgłaszasz gusta.
 3. Przeczytaj **cały** zmieniony plik, nie sam diff. Połowa poważnych błędów jest niewidoczna
    w oderwaniu od reszty pliku.
 

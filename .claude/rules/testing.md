@@ -30,24 +30,8 @@ Nie musi być zautomatyzowane, musi być zobaczone na własne oczy.
 | Integracyjne | Vitest + supertest / prawdziwa baza w Dockerze | endpointy i repozytoria dotykające bazy |
 | E2E | Playwright | ścieżka logowania i inne rzeczy, których naprawdę szkoda by było zepsuć bez ostrzeżenia |
 
-### Selektory w testach UI
-
-**Podstawa: rola + dostępna nazwa.**
-
-```ts
-page.getByRole('button', { name: 'Zaloguj' })
-page.getByLabel('E-mail')
-page.getByRole('heading', { name: 'Ustawienia' })
-```
-
-Jeśli test nie znajduje elementu po nazwie, element jest też niedostępny dla technologii
-asystujących — błąd do naprawienia w komponencie (WCAG 2.2 AA nadal obowiązuje jako wymóg
-produktu, `.claude/rules/web.md` — to osobna sprawa od tego, ile testów piszesz), nie
-powód do dołożenia selektora.
-
-`data-testid` tylko tam, gdzie nazwa nie wystarcza (element listy, sekcja strony) —
-kebab-case, `data-testid="obszar-element"`. Zakazane: klasy CSS, nazwy tagów, `nth-child`,
-XPath po strukturze.
+Selektory w testach klikających w interfejs (rola + dostępna nazwa, `data-testid` jako
+wyjątek) — osobno w `.claude/rules/testing-selectors.md`, czytaj przy pisaniu testu UI.
 
 ### Co test ma udowadniać, jeśli już istnieje
 
