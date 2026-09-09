@@ -1,15 +1,16 @@
-import { formatMeters, getFloorPlanBoundingBox, getWallLengthMm } from "./geometry";
-import type { FloorPlanTestData, Wall } from "./types";
+import { formatMeters, getFloorPlanBoundingBox, getWallBoundingSizeMm } from "./geometry";
+import type { FloorPlanTestData, Point, Wall } from "./types";
 
 // Margines wokół rzutu w viewBox, w tych samych mm co dane — ADR-0006.
 const VIEW_PADDING_MM = 400;
-// Niewidoczna ścieżka pod ścianą, żeby obszar trafienia nie schodził poniżej celu
-// dotykowego nawet przy cienkiej ścianie — .claude/rules/floor-plan.md.
-const MIN_HIT_WIDTH_MM = 400;
 
 type FloorPlanView2DProps = {
   data: FloorPlanTestData;
 };
+
+function toPolygonPoints(points: readonly Point[]): string {
+  return points.map((point) => `${point.xMm},${point.yMm}`).join(" ");
+}
 
 // SVG, 1 jednostka = 1 mm (ADR-0006). Kolory wyłącznie przez currentColor + token motywu.
 export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
@@ -27,7 +28,7 @@ export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
         <polygon
           key={room.id}
           aria-hidden="true"
-          points={room.vertices.map((vertex) => `${vertex.xMm},${vertex.yMm}`).join(" ")}
+          points={toPolygonPoints(room.vertices)}
           fill="currentColor"
           className="text-muted/70"
         />
@@ -40,34 +41,17 @@ export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
 }
 
 function WallShape({ wall, index }: { wall: Wall; index: number }) {
-  const lengthLabel = formatMeters(getWallLengthMm(wall));
-  const hitWidthMm = Math.max(wall.thicknessMm, MIN_HIT_WIDTH_MM);
+  const { widthMm, depthMm } = getWallBoundingSizeMm(wall);
+  const label = `Ściana ${index + 1}, ${formatMeters(widthMm)} × ${formatMeters(depthMm)}`;
 
   return (
-    <g
+    <polygon
       role="button"
       tabIndex={0}
-      aria-label={`Ściana ${index + 1}, długość ${lengthLabel}`}
+      aria-label={label}
+      points={toPolygonPoints(wall.points)}
+      fill="currentColor"
       className="text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-    >
-      <line
-        x1={wall.startXMm}
-        y1={wall.startYMm}
-        x2={wall.endXMm}
-        y2={wall.endYMm}
-        stroke="transparent"
-        strokeWidth={hitWidthMm}
-        pointerEvents="stroke"
-      />
-      <line
-        x1={wall.startXMm}
-        y1={wall.startYMm}
-        x2={wall.endXMm}
-        y2={wall.endYMm}
-        stroke="currentColor"
-        strokeWidth={wall.thicknessMm}
-        strokeLinecap="square"
-      />
-    </g>
+    />
   );
 }

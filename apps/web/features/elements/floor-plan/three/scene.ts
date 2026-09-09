@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import type { BoundingBox } from "../geometry";
+import { DEFAULT_WALL_HEIGHT_MM } from "../types";
 import type { FloorPlanTestData, Room, Wall } from "../types";
 
 // mm to jedyna jednostka danych (ADR-0002); metry żyją wyłącznie w scenie Three.js,
@@ -86,23 +87,20 @@ function addLights(scene: THREE.Scene, box: BoundingBox): void {
   scene.add(directionalLight);
 }
 
-// Ściana = bryła wyciągnięta z segmentu 2D: długość × thicknessMm × heightMm (ADR-0002),
-// dowód, że 2D i 3D czytają te same dane.
+// Ściana = wielokąt jej czterech rogów wytłoczony w pionie (ADR-0002), dokładnie
+// te same punkty co w 2D (FloorPlanView2D) — dowód, że oba widoki czytają jeden
+// model. Mapowanie mm → m i -yMm identyczne jak w buildFloorMesh, żeby ściany
+// i podłoga leżały w tej samej płaszczyźnie XZ.
 function buildWallMesh(wall: Wall, colorCss: string): { mesh: THREE.Mesh } & Disposable {
-  const startX = wall.startXMm * MM_TO_M;
-  const startZ = wall.startYMm * MM_TO_M;
-  const endX = wall.endXMm * MM_TO_M;
-  const endZ = wall.endYMm * MM_TO_M;
-  const lengthM = Math.hypot(endX - startX, endZ - startZ);
-  const thicknessM = wall.thicknessMm * MM_TO_M;
-  const heightM = wall.heightMm * MM_TO_M;
+  const shape = new THREE.Shape(
+    wall.points.map((point) => new THREE.Vector2(point.xMm * MM_TO_M, -point.yMm * MM_TO_M)),
+  );
+  const heightM = DEFAULT_WALL_HEIGHT_MM * MM_TO_M;
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: heightM, bevelEnabled: false });
+  geometry.rotateX(-Math.PI / 2);
 
-  const geometry = new THREE.BoxGeometry(lengthM, heightM, thicknessM);
   const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(colorCss) });
   const mesh = new THREE.Mesh(geometry, material);
-
-  mesh.position.set((startX + endX) / 2, heightM / 2, (startZ + endZ) / 2);
-  mesh.rotation.y = -Math.atan2(endZ - startZ, endX - startX);
 
   return {
     mesh,

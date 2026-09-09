@@ -1,13 +1,22 @@
 import type { FloorPlanTestData, Wall } from "./types";
 
-export function getWallLengthMm(wall: Wall): number {
-  return Math.hypot(wall.endXMm - wall.startXMm, wall.endYMm - wall.startYMm);
-}
-
 // Metry pojawiają się wyłącznie jako sformatowany tekst w UI — dane zostają w mm
 // (.claude/rules/floor-plan.md).
 export function formatMeters(valueMm: number): string {
   return `${(valueMm / 1000).toFixed(2).replace(".", ",")} m`;
+}
+
+// Rozmiar prostokąta ściany z jego czterech rogów — wyłącznie do etykiety
+// dostępności. Rysowanie używa punktów wprost (FloorPlanView2D, three/scene.ts),
+// to nie jest formuła, z której wyliczamy kształt.
+export function getWallBoundingSizeMm(wall: Wall): { widthMm: number; depthMm: number } {
+  const xs = wall.points.map((point) => point.xMm);
+  const ys = wall.points.map((point) => point.yMm);
+
+  return {
+    widthMm: Math.max(...xs) - Math.min(...xs),
+    depthMm: Math.max(...ys) - Math.min(...ys),
+  };
 }
 
 export type BoundingBox = {
@@ -24,8 +33,10 @@ export function getFloorPlanBoundingBox(data: FloorPlanTestData): BoundingBox {
   const ys: number[] = [];
 
   for (const wall of data.walls) {
-    xs.push(wall.startXMm, wall.endXMm);
-    ys.push(wall.startYMm, wall.endYMm);
+    for (const point of wall.points) {
+      xs.push(point.xMm);
+      ys.push(point.yMm);
+    }
   }
   for (const room of data.rooms) {
     for (const vertex of room.vertices) {
