@@ -98,6 +98,9 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
     });
   }
 
+  const searchLabel = openPanel === "search" ? "Ukryj wyszukiwanie poziomów" : "Szukaj poziomów";
+  const addLabel = openPanel === "add" ? "Zamknij dodawanie poziomu" : "Dodaj poziom";
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2">
@@ -109,7 +112,8 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "search"}
-            aria-label={openPanel === "search" ? "Ukryj wyszukiwanie poziomów" : "Szukaj poziomów"}
+            aria-label={searchLabel}
+            tooltip={searchLabel}
             onClick={() => selectPanel("search")}
           >
             <Search aria-hidden="true" />
@@ -120,7 +124,8 @@ function LevelsSection({ locationId, levels }: { locationId: string; levels: Lev
             size="icon"
             className="size-11"
             aria-pressed={openPanel === "add"}
-            aria-label={openPanel === "add" ? "Zamknij dodawanie poziomu" : "Dodaj poziom"}
+            aria-label={addLabel}
+            tooltip={addLabel}
             onClick={() => selectPanel("add")}
           >
             <Plus aria-hidden="true" />

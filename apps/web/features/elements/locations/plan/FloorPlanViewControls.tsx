@@ -44,6 +44,7 @@ export function FloorPlanViewControls({
 }: FloorPlanViewControlsProps) {
   const isTwoD = mode === "2d";
   const WallVisibilityIcon = WALL_VISIBILITY_MODE_ICON[wallVisibilityMode];
+  const modeLabel = isTwoD ? "Przełącz na widok 3D" : "Przełącz na widok 2D";
 
   return (
     <>
@@ -52,7 +53,8 @@ export function FloorPlanViewControls({
         variant="ghost"
         size="icon"
         className="size-11"
-        aria-label={isTwoD ? "Przełącz na widok 3D" : "Przełącz na widok 2D"}
+        aria-label={modeLabel}
+        tooltip={modeLabel}
         onClick={() => onModeChange(isTwoD ? "3d" : "2d")}
       >
         {isTwoD ? <Box aria-hidden="true" /> : <Map aria-hidden="true" />}

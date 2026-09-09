@@ -27,6 +27,7 @@ export function ConfirmDeleteButton({ itemLabel, onConfirm, isPending }: Confirm
         size="icon"
         className="size-11"
         aria-label={`Usuń ${itemLabel}`}
+        tooltip={`Usuń ${itemLabel}`}
         onClick={() => setIsConfirming(true)}
       >
         <Trash2 aria-hidden="true" />
