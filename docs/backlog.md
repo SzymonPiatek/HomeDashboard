@@ -114,3 +114,77 @@ Wpisy sortowane rosnąco po numerze. Numer nie oznacza priorytetu ani kolejnośc
 - **Koszt zaniechania:** tabela sesji rośnie bez ograniczenia; do rozstrzygnięcia razem
   z pierwszym zadaniem cyklicznym w `apps/api`.
 - **Status:** otwarte
+
+### BL-010 — Uporządkowanie odwołań do nieistniejących numerów ADR w regułach
+
+- **Źródło:** [docs/adr/README.md](adr/README.md), sekcja o nieciągłościach numeracji
+- **Co odkładamy:** rozstrzygnięcie, co zrobić z odwołaniami do ADR-0004, 0005, 0007, 0009,
+  0016, 0017, 0019, 0020, 0024, 0025 w `.claude/rules/api.md`, `web.md` i `data.md` —
+  pochodzą z projektu referencyjnego i nie mają dokumentów w tym repozytorium.
+- **Koszt zaniechania:** treść reguły obowiązuje, ale numer prowadzi donikąd; każdy agent
+  traci czas na szukanie dokumentu, którego nie ma, i nie wie, czy reguła jest aktualna.
+  Wpis istniał tylko jako odwołanie w `docs/adr/README.md` — spisany 2026-09-09.
+- **Status:** otwarte
+
+### BL-011 — Otwory w ścianach: drzwi i okna
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md)
+- **Co odkładamy:** modelowanie otworów przypiętych do ściany (położenie wzdłuż ściany,
+  szerokość, wysokość, wysokość parapetu) i ich rysowanie w rzucie.
+- **Koszt zaniechania:** rzut 2D pokazuje mieszkanie bez przejść między pokojami, a przyszły
+  widok 3D (BL-001) wygląda jak zamknięty bunkier. Dołożenie jest w pełni addytywne —
+  ściana jest wierszem z identyfikatorem, więc otwory dokłada się nową tabelą bez migracji
+  istniejących danych.
+- **Status:** otwarte
+
+### BL-012 — Typ pokoju, materiał podłogi i elewacja podłogi
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md)
+- **Co odkładamy:** pokój ma dziś wyłącznie nazwę. Brakuje typu (kuchnia, łazienka…),
+  materiału podłogi i elewacji względem poziomu zero (próg na balkon, podest).
+- **Koszt zaniechania:** wypełnienie podłogi w 2D jest jednolite i nieinformacyjne, a 3D
+  nie ma czym pokryć podłóg ani jak pokazać różnicy poziomów. Dołożenie kolumn jest
+  addytywne, więc dług jest tani.
+- **Status:** otwarte
+
+### BL-013 — Serwerowa walidacja prostoty wielokąta pokoju
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md)
+- **Co odkładamy:** sprawdzenie po stronie API, że wielokąt pokoju nie przecina sam siebie
+  i ma dodatnie pole. Kontrakt pilnuje dziś tylko liczby i unikalności wierzchołków.
+- **Koszt zaniechania:** użytkownik może zapisać pokój w kształcie ósemki; wygląda dziwnie
+  w 2D, a w 3D triangulacja podłogi da nieprzewidywalny wynik. Przy jednym koncie szkodzi
+  wyłącznie samemu autorowi rzutu, dlatego to nie jest blokada.
+- **Status:** otwarte
+
+### BL-014 — Wiele kondygnacji i wiele rzutów na koncie
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md)
+- **Co odkładamy:** poziom/kondygnację jako byt (dom dwupiętrowy, piwnica) oraz więcej niż
+  jeden rzut na konto — dziś `FloorPlan.accountId` jest unikalny, a zasób nie ma
+  identyfikatora w adresie.
+- **Koszt zaniechania:** model obsługuje wyłącznie jedno mieszkanie na jednym poziomie,
+  zgodnie z PRD. Zmiana wymagałaby nowej encji, identyfikatora w ścieżce API i przepięcia
+  istniejących wierszy — to najdroższy z odłożonych tu długów.
+- **Status:** otwarte
+
+### BL-015 — Kafelki elementów na pulpicie
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md)
+- **Co odkładamy:** renderowanie kafelków elementów na stronie pulpitu (`/`). Rejestr
+  elementów powstaje w gałęzi SP-005 jako źródło nawigacji i tras, bez części kafelkowej.
+- **Koszt zaniechania:** wejście na rzut mieszkania prowadzi wyłącznie przez nawigację —
+  US-2 jest spełnione, ale główny scenariusz z PRD (krok 3: „widzi pulpit z kafelkami")
+  jeszcze nie. Rejestr ma już miejsce na komponent kafelka, więc dołożenie jest addytywne.
+- **Status:** otwarte
+
+### BL-016 — Podpowiadanie pokoju z domkniętych obszarów grafu ścian
+
+- **Źródło:** [docs/adr/0002-floor-plan-normalized-entities-in-millimeters.md](adr/0002-floor-plan-normalized-entities-in-millimeters.md),
+  wariant C
+- **Co odkładamy:** wykrywanie domkniętych obszarów między ścianami i proponowanie z nich
+  gotowego wielokąta pokoju, zamiast obrysowywania go ręcznie.
+- **Koszt zaniechania:** pokój rysuje się drugi raz po tych samych liniach, a przesunięcie
+  ściany nie przesuwa krawędzi pokoju — trzeba poprawić oba. Przy jednym mieszkaniu
+  edytowanym rzadko to niedogodność, nie blokada.
+- **Status:** otwarte
