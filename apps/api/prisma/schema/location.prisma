@@ -1,0 +1,34 @@
+// Lokalizacja i poziom (ADR-0008): Location jest jedynym miejscem z accountId w tym
+// łańcuchu; Level jest korzeniem agregatu rzutu i nosi `version` — .claude/rules/locations.md.
+model Location {
+  id        String   @id @default(cuid())
+  accountId String
+  name      String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  levels  Level[]
+
+  @@index([accountId])
+  @@map("locations")
+}
+
+// `order` nadaje serwer (max + 1); brak @@unique([locationId, order]) jest świadomy —
+// przyszły reorder (BL-017) przepisuje wiele wierszy naraz — .claude/rules/locations.md.
+model Level {
+  id         String   @id @default(cuid())
+  locationId String
+  name       String
+  order      Int
+  version    Int      @default(0)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  walls    Wall[]
+  rooms    Room[]
+
+  @@index([locationId, order])
+  @@map("levels")
+}
