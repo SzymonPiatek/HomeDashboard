@@ -1,9 +1,9 @@
+import type { FloorPlanDocument, Room, Wall } from "@repo/contracts/floor-plan";
+import { DEFAULT_WALL_HEIGHT_MM } from "@repo/contracts/floor-plan";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-import type { BoundingBox } from "../geometry";
-import { DEFAULT_WALL_HEIGHT_MM } from "../types";
-import type { FloorPlanTestData, Room, Wall } from "../types";
+import type { BoundingBox } from "../geometry/geometry";
 
 export const MM_TO_M = 1 / 1000;
 
@@ -85,7 +85,7 @@ function buildWallMesh(wall: Wall, colorCss: string): { mesh: THREE.Mesh } & Dis
   const shape = new THREE.Shape(
     wall.points.map((point) => new THREE.Vector2(point.xMm * MM_TO_M, -point.yMm * MM_TO_M)),
   );
-  const heightM = DEFAULT_WALL_HEIGHT_MM * MM_TO_M;
+  const heightM = (wall.heightMm ?? DEFAULT_WALL_HEIGHT_MM) * MM_TO_M;
   const geometry = new THREE.ExtrudeGeometry(shape, { depth: heightM, bevelEnabled: false });
   geometry.rotateX(-Math.PI / 2);
 
@@ -123,17 +123,17 @@ function buildFloorMesh(room: Room, colorCss: string): { mesh: THREE.Mesh } & Di
   };
 }
 
-function addFloorPlanMeshes(scene: THREE.Scene, data: FloorPlanTestData): Disposable[] {
+function addFloorPlanMeshes(scene: THREE.Scene, document: FloorPlanDocument): Disposable[] {
   const wallColor = resolveCssColor("--foreground");
   const floorColor = resolveCssColor("--muted");
   const disposables: Disposable[] = [];
 
-  for (const room of data.rooms) {
+  for (const room of document.rooms) {
     const floor = buildFloorMesh(room, floorColor);
     scene.add(floor.mesh);
     disposables.push(floor);
   }
-  for (const wall of data.walls) {
+  for (const wall of document.walls) {
     const wallMesh = buildWallMesh(wall, wallColor);
     scene.add(wallMesh.mesh);
     disposables.push(wallMesh);
@@ -145,7 +145,7 @@ function addFloorPlanMeshes(scene: THREE.Scene, data: FloorPlanTestData): Dispos
 export function createFloorPlanScene(
   container: HTMLElement,
   box: BoundingBox,
-  data: FloorPlanTestData,
+  document: FloorPlanDocument,
 ): Scene3D {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(resolveCssColor("--background"));
@@ -157,7 +157,7 @@ export function createFloorPlanScene(
 
   const controls = createControls(camera, renderer, box);
   addLights(scene, box);
-  const disposables = addFloorPlanMeshes(scene, data);
+  const disposables = addFloorPlanMeshes(scene, document);
 
   return { scene, camera, renderer, controls, disposables };
 }

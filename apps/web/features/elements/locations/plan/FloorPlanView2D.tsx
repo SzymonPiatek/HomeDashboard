@@ -1,28 +1,30 @@
-import { formatMeters, getFloorPlanBoundingBox, getWallBoundingSizeMm } from "./geometry";
-import type { FloorPlanTestData, Point, Wall } from "./types";
+import type { FloorPlanDocument, Point, Wall } from "@repo/contracts/floor-plan";
+
+import { formatMeters, getFloorPlanBoundingBox, getWallBoundingSizeMm } from "./geometry/geometry";
 
 const VIEW_PADDING_MM = 400;
+// Zapewnia widoczną siatkę nawet dla pustego dokumentu (US-2) zamiast zerowego viewBox.
+const MIN_VIEW_SIZE_MM = 2000;
 
 type FloorPlanView2DProps = {
-  data: FloorPlanTestData;
+  document: FloorPlanDocument;
 };
 
 function toPolygonPoints(points: readonly Point[]): string {
   return points.map((point) => `${point.xMm},${point.yMm}`).join(" ");
 }
 
-export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
-  const box = getFloorPlanBoundingBox(data);
-  const viewBox = [
-    box.minXMm - VIEW_PADDING_MM,
-    box.minYMm - VIEW_PADDING_MM,
-    box.maxXMm - box.minXMm + VIEW_PADDING_MM * 2,
-    box.maxYMm - box.minYMm + VIEW_PADDING_MM * 2,
-  ].join(" ");
+export function FloorPlanView2D({ document }: FloorPlanView2DProps) {
+  const box = getFloorPlanBoundingBox(document);
+  const width = Math.max(box.maxXMm - box.minXMm, MIN_VIEW_SIZE_MM) + VIEW_PADDING_MM * 2;
+  const height = Math.max(box.maxYMm - box.minYMm, MIN_VIEW_SIZE_MM) + VIEW_PADDING_MM * 2;
+  const viewBox = [box.minXMm - VIEW_PADDING_MM, box.minYMm - VIEW_PADDING_MM, width, height].join(
+    " ",
+  );
 
   return (
-    <svg viewBox={viewBox} aria-label="Rzut mieszkania, widok z góry" className="w-full flex-1">
-      {data.rooms.map((room) => (
+    <svg viewBox={viewBox} aria-label="Rzut poziomu, widok z góry" className="w-full flex-1">
+      {document.rooms.map((room) => (
         <polygon
           key={room.id}
           aria-hidden="true"
@@ -31,7 +33,7 @@ export function FloorPlanView2D({ data }: FloorPlanView2DProps) {
           className="text-muted/70"
         />
       ))}
-      {data.walls.map((wall, index) => (
+      {document.walls.map((wall, index) => (
         <WallShape key={wall.id} wall={wall} index={index} />
       ))}
     </svg>

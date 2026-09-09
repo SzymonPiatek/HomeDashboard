@@ -1,2 +1,13 @@
 @import "tailwindcss";
 @import "@repo/config/tailwind/theme.css";
+
+@layer utilities {
+  /* Pasek przewijania okruszków ukryty, przewijanie zostaje działać. */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
