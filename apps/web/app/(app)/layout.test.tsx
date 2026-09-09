@@ -12,24 +12,26 @@ vi.mock("@/features/auth/api/use-session", () => ({
   useSession: () => useSessionMock(),
 }));
 
-import DashboardPage from "./page";
+import AppLayout from "./layout";
 
-function renderPage() {
+function renderLayout() {
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <DashboardPage />
+      <AppLayout>
+        <p>Treść strony</p>
+      </AppLayout>
     </QueryClientProvider>,
   );
 }
 
-describe("DashboardPage", () => {
+describe("AppLayout", () => {
   beforeEach(() => {
     replaceMock.mockClear();
     useSessionMock.mockReset();
   });
 
-  it("pokazuje pulpit i przycisk wylogowania, gdy sesja jest aktywna", () => {
+  it("pokazuje treść strony i przycisk wylogowania, gdy sesja jest aktywna", () => {
     useSessionMock.mockReturnValue({
       isPending: false,
       isError: false,
@@ -38,13 +40,13 @@ describe("DashboardPage", () => {
       refetch: vi.fn(),
     });
 
-    renderPage();
+    renderLayout();
 
-    expect(screen.getByRole("heading", { name: "Pulpit domowy" })).toBeInTheDocument();
+    expect(screen.getByText("Treść strony")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Wyloguj się" })).toBeInTheDocument();
   });
 
-  it("nie pokazuje pulpitu i przekierowuje do /login, gdy sesja nie jest aktywna", () => {
+  it("nie pokazuje treści i przekierowuje do /login, gdy sesja nie jest aktywna", () => {
     useSessionMock.mockReturnValue({
       isPending: false,
       isError: false,
@@ -53,9 +55,9 @@ describe("DashboardPage", () => {
       refetch: vi.fn(),
     });
 
-    renderPage();
+    renderLayout();
 
-    expect(screen.queryByRole("heading", { name: "Pulpit domowy" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Treść strony")).not.toBeInTheDocument();
     expect(replaceMock).toHaveBeenCalledWith("/login");
   });
 });

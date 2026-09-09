@@ -5,7 +5,7 @@ import { LogoutButton } from "@/features/auth/components/LogoutButton";
 // Bez propsów: to element ramki pulpitu, nie komponent domenowy — .claude/rules/web.md.
 export function Navbar() {
   return (
-    <nav aria-label="Pulpit" className="flex items-center justify-end gap-2 p-2">
+    <nav aria-label="Pulpit" className="flex items-center justify-end gap-2 p-2 md:p-4 lg:p-6">
       <ThemeToggle />
       <LogoutButton />
     </nav>

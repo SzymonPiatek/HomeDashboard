@@ -13,7 +13,7 @@ export function Breadcrumbs() {
   const items = [{ label: "Pulpit", href: "/" }, ...trail];
 
   return (
-    <nav aria-label="Okruszki" className="px-2 py-2">
+    <nav aria-label="Okruszki" className="p-2 md:p-4 lg:p-6">
       <ol className="scrollbar-hide flex items-center gap-1 overflow-x-auto whitespace-nowrap">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
