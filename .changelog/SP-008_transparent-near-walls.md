@@ -17,6 +17,7 @@ więc wnętrze jest widoczne bez ręcznego obracania.
 | ---- | ------ | ------ |
 | 2026-09-09 | `plan/three/scene.ts` | Dla każdej ściany liczony jest środek i normalna skierowana na zewnątrz najbliższego pokoju; `updateNearCameraWallVisibility` co klatkę chowa ścianę, gdy kamera stoi po jej zewnętrznej stronie. |
 | 2026-09-09 | `plan/FloorPlanView3D.tsx`, `plan/FloorPlanViewer.tsx` | Przycisk trójstanowy (wszystkie widoczne / bliskie ukryte / wszystkie ukryte) w jednym rzędzie z przełącznikiem widoku 2D/3D, widoczny tylko w widoku 3D. |
+| 2026-09-09 | `LocationsListPageView.tsx` i okolice | Poza zakresem „Po co ta zmiana" powyżej, przy okazji: lista lokalizacji dostała siatkę kafelków z ikoną (jak pulpit), nagłówek z przyciskami szukaj/dodaj (wzajemnie wykluczające się panele, szerokość max 500px, lewe wyrównanie), przycisk dodania skrócony do „Dodaj". |
 
 ## Decyzje podjęte po drodze
 
