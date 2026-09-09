@@ -1,8 +1,8 @@
 import { Building2 } from "lucide-react";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Tile } from "@/components/ui/Tile";
 
 import { LOCATION_ROUTES } from "../lib/routes";
 
@@ -68,19 +68,12 @@ export function LocationsGrid({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
         {filteredItems.map((location) => (
-          <Link
+          <Tile
             key={location.id}
             href={LOCATION_ROUTES.detail(location.id)}
-            className="group relative flex aspect-square flex-col items-center justify-end overflow-hidden rounded-xl border bg-card p-4 shadow-sm transition-all outline-none hover:-translate-y-0.5 hover:border-ring/50 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 flex items-center justify-center"
-            >
-              <Building2 aria-hidden className="size-14 text-foreground" />
-            </span>
-            <span className="relative text-sm font-semibold text-foreground">{location.name}</span>
-          </Link>
+            label={location.name}
+            icon={Building2}
+          />
         ))}
       </div>
       {hasNextPage ? (
