@@ -13,13 +13,14 @@ export function LogoutButton() {
     <div className="flex flex-col items-end gap-1">
       <Button
         type="button"
-        variant="ghost"
-        className="h-11 gap-2"
+        variant="default"
+        size="icon"
+        className="size-11"
+        aria-label={logout.isPending ? "Wylogowywanie…" : "Wyloguj się"}
         onClick={() => logout.mutate()}
         disabled={logout.isPending}
       >
-        <LogOut aria-hidden="true" className="size-4" />
-        {logout.isPending ? "Wylogowywanie…" : "Wyloguj się"}
+        <LogOut aria-hidden="true" />
       </Button>
       {logout.isError ? (
         // Przekierowanie do /login trwa w onError hooka; komunikat jest na wypadek,
