@@ -34,7 +34,7 @@ export function useBreadcrumbs(): BreadcrumbItem[] {
   return useContext(BreadcrumbItemsContext);
 }
 
-// Strona zgłasza swój ślad okruszków raz, gdy zna nazwy — Navbar go tylko czyta i nie
+// Strona zgłasza swój ślad okruszków raz, gdy zna nazwy — Breadcrumbs go tylko czyta i nie
 // zna elementów (rejestr jest jedynym miejscem importującym features/elements/**,
 // .claude/rules/web.md). `items` musi być zmemoizowane u wywołującego (useMemo),
 // inaczej efekt odpala przy każdym renderze.

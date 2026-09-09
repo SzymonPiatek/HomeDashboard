@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { useBreadcrumbs } from "@/features/dashboard/lib/breadcrumbs";
 
-// Pasek okruszków pod Navbarem, pełna szerokość. Przewija się poziomo bez widocznego
+// Pasek okruszków na górze strony, pełna szerokość. Przewija się poziomo bez widocznego
 // paska na wąskich ekranach (klasa scrollbar-hide, app/globals.css). Bez propsów: to
 // element ramki pulpitu, nie komponent domenowy — .claude/rules/web.md.
 export function Breadcrumbs() {
@@ -26,14 +26,14 @@ export function Breadcrumbs() {
               {isLast || !item.href ? (
                 <span
                   aria-current={isLast ? "page" : undefined}
-                  className="px-1 py-1 text-sm font-medium"
+                  className="px-1 py-1 text-md font-medium"
                 >
                   {item.label}
                 </span>
               ) : (
                 <Link
                   href={item.href}
-                  className="rounded px-1 py-1 text-sm text-muted-foreground outline-none hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="rounded px-1 py-1 text-md text-muted-foreground outline-none hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {item.label}
                 </Link>
