@@ -14,6 +14,18 @@
     "./auth": {
       "types": "./dist/auth.d.ts",
       "default": "./dist/auth.js"
+    },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "default": "./dist/pagination.js"
+    },
+    "./locations": {
+      "types": "./dist/locations.d.ts",
+      "default": "./dist/locations.js"
+    },
+    "./floor-plan": {
+      "types": "./dist/floor-plan.d.ts",
+      "default": "./dist/floor-plan.js"
     }
   },
   "scripts": {
