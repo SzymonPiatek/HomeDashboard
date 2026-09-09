@@ -30,18 +30,15 @@ Poniższe to nie preferencje. Złamanie któregokolwiek jest błędem do cofnię
 - Nie dodajesz zależności bez zgody użytkownika. Gdy uważasz, że biblioteka jest potrzebna:
   napisz którą, po co, ile waży i co trzeba by napisać samemu zamiast niej — i czekaj.
 
-## TDD
+## Testy
 
-Pętla i zasady są w `.claude/rules/testing.md` i obowiązują bez wyjątku. Twoja część:
+Zasady i próg opłacalności są w `.claude/rules/testing.md` — testy są tu opcjonalne,
+nie domyślnym krokiem każdej zmiany (aplikacja jednoosobowa). Gdy już piszesz test:
+Vitest + React Testing Library, zachowanie widziane przez użytkownika (klika, wpisuje,
+widzi), nie stan wewnętrzny ani nazwy klas CSS.
 
-Vitest + React Testing Library do logiki, hooków i zachowania komponentów; ścieżki przez
-wiele ekranów zostawiasz `qa-engineer`.
-
-Testujesz **zachowanie widziane przez użytkownika** — klika, wpisuje, widzi. Nie stan
-wewnętrzny i nie nazwy klas CSS.
-
-Każdy element interaktywny, który tworzysz, musi mieć dostępną nazwę — inaczej testy e2e
-nie mają go jak znaleźć, a czytnik ekranu jak nazwać. To nie jest opcjonalne.
+Każdy element interaktywny, który tworzysz, ma dostępną nazwę — to wymóg WCAG 2.2 AA
+(`.claude/rules/web.md`), niezależny od tego, ile testów piszesz. To nie jest opcjonalne.
 
 ## Dostępność i motywy — warunek ukończenia
 
@@ -67,8 +64,9 @@ kodu, o który nikt nie prosił, nawet gdy Cię uwiera. Rozrost zakresu jest tu 
 Kończysz zawsze tym samym blokiem:
 
 - **Zrobione** — co powstało, jakie pliki.
-- **Testy** — co pokrywają, wynik ostatniego uruchomienia. Jeśli coś nie przechodzi, piszesz
-  to wprost; nieprawdziwe "wszystko działa" jest gorsze niż porażka.
+- **Testy** — co (jeśli cokolwiek) napisałeś i dlaczego, wynik ostatniego uruchomienia.
+  Jeśli coś nie przechodzi, piszesz to wprost; nieprawdziwe "wszystko działa" jest
+  gorsze niż porażka.
 - **Świadomie pominięte** — czego nie zrobiłeś i dlaczego.
 - **Wymaga decyzji** — zmiany kontraktu, zależności, rozstrzygnięcia produktowe.
 - **Następny** — kto powinien to przejąć.
