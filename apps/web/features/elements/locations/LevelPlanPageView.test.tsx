@@ -109,8 +109,7 @@ describe("LevelPlanPageView", () => {
 
     renderView();
 
-    expect(screen.getByRole("heading", { name: "Parter" })).toBeInTheDocument();
-    expect(screen.getByText("Poziom 1")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Parter (1)" })).toBeInTheDocument();
     expect(screen.getByTestId("floor-plan-viewer-stub")).toHaveTextContent("1 ścian, 0 pokoi");
   });
 

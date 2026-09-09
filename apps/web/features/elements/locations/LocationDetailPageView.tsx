@@ -1,19 +1,26 @@
 "use client";
 
-import { NAME_MAX_LENGTH, type LevelSummary } from "@repo/contracts/locations";
-import Link from "next/link";
+import type { LevelSummary } from "@repo/contracts/locations";
+import { Plus, Search } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { type FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useSetBreadcrumbs } from "@/features/dashboard/lib/breadcrumbs";
 
-import { useCreateLevel, useDeleteLocation, useLocation } from "./api/use-location";
+import { useDeleteLocation, useLocation } from "./api/use-location";
+import { AddLevelForm } from "./components/AddLevelForm";
 import { ConfirmDeleteButton } from "./components/ConfirmDeleteButton";
+import { LevelsGrid, LevelsGridEmpty } from "./components/LevelsGrid";
 import { LOCATION_ROUTES } from "./lib/routes";
 import { LocationNameForm } from "./LocationNameForm";
+
+type OpenPanel = "none" | "search" | "add";
+
+// 500px — czytelna szerokość jednego pola/formularza, nie ma na to tokenu w design systemie.
+const PANEL_MAX_WIDTH = "max-w-[500px]";
 
 // Strona szczegółów lokalizacji nie przyjmuje propsów — identyfikator pochodzi
 // z trasy (.claude/rules/web.md, sekcja "Widoki stron elementu").
@@ -78,90 +85,70 @@ export function LocationDetailPageView() {
 }
 
 function LevelsSection({ locationId, levels }: { locationId: string; levels: LevelSummary[] }) {
-  const sortedLevels = [...levels].sort((a, b) => a.order - b.order);
+  const sortedLevels = useMemo(() => [...levels].sort((a, b) => a.order - b.order), [levels]);
+  const [openPanel, setOpenPanel] = useState<OpenPanel>("none");
+  const [query, setQuery] = useState("");
 
-  return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">Poziomy</h2>
-      <AddLevelForm locationId={locationId} />
-      {sortedLevels.length === 0 ? (
-        <p className="text-muted-foreground">Ta lokalizacja nie ma jeszcze żadnego poziomu.</p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {sortedLevels.map((level, index) => (
-            <LevelRow key={level.id} locationId={locationId} level={level} position={index + 1} />
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function AddLevelForm({ locationId }: { locationId: string }) {
-  const createLevel = useCreateLevel(locationId);
-  const [name, setName] = useState("");
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const trimmedName = name.trim();
-    if (!trimmedName) return;
-
-    createLevel.mutate({ name: trimmedName }, { onSuccess: () => setName("") });
+  // Wyszukiwanie i dodawanie wykluczają się nawzajem — otwarcie jednego chowa drugie.
+  function selectPanel(panel: OpenPanel) {
+    setOpenPanel((current) => {
+      const next = current === panel ? "none" : panel;
+      if (next !== "search") setQuery("");
+      return next;
+    });
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="new-level-name" className="text-sm font-medium">
-            Nazwa poziomu
-          </label>
-          <Input
-            id="new-level-name"
-            value={name}
-            maxLength={NAME_MAX_LENGTH}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="np. Parter"
-            required
-          />
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">Poziomy</h2>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-11"
+            aria-pressed={openPanel === "search"}
+            aria-label={openPanel === "search" ? "Ukryj wyszukiwanie poziomów" : "Szukaj poziomów"}
+            onClick={() => selectPanel("search")}
+          >
+            <Search aria-hidden="true" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-11"
+            aria-pressed={openPanel === "add"}
+            aria-label={openPanel === "add" ? "Zamknij dodawanie poziomu" : "Dodaj poziom"}
+            onClick={() => selectPanel("add")}
+          >
+            <Plus aria-hidden="true" />
+          </Button>
         </div>
-        <Button
-          type="submit"
-          className="h-11"
-          disabled={createLevel.isPending || name.trim().length === 0}
-        >
-          {createLevel.isPending ? "Dodawanie…" : "Dodaj poziom"}
-        </Button>
       </div>
-      {createLevel.isError ? (
-        <p role="alert" className="text-sm text-destructive">
-          {createLevel.error.message}
-        </p>
+
+      {openPanel === "search" ? (
+        <label className={`flex flex-col gap-1 ${PANEL_MAX_WIDTH}`}>
+          <span className="sr-only">Szukaj poziomów</span>
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Szukaj poziomów…"
+            autoFocus
+          />
+        </label>
       ) : null}
-    </form>
-  );
-}
 
-function LevelRow({
-  locationId,
-  level,
-  position,
-}: {
-  locationId: string;
-  level: LevelSummary;
-  position: number;
-}) {
-  const label = `Poziom ${position}`;
+      {openPanel === "add" ? (
+        <AddLevelForm locationId={locationId} className={PANEL_MAX_WIDTH} />
+      ) : null}
 
-  return (
-    <li>
-      <Link
-        href={LOCATION_ROUTES.level(locationId, level.id)}
-        className="flex min-h-11 flex-col gap-0.5 rounded-lg border bg-card p-3 outline-none transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      >
-        <span className="text-sm text-muted-foreground">{label}</span>
-        <span className="font-medium">{level.name}</span>
-      </Link>
-    </li>
+      {sortedLevels.length === 0 ? (
+        <LevelsGridEmpty />
+      ) : (
+        <LevelsGrid locationId={locationId} levels={sortedLevels} query={query} />
+      )}
+    </div>
   );
 }

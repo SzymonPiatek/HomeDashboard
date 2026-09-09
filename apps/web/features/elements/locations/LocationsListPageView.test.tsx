@@ -64,7 +64,9 @@ describe("LocationsListPageView", () => {
     renderView();
 
     expect(
-      screen.getByText("Nie masz jeszcze żadnej lokalizacji. Dodaj pierwszą powyżej."),
+      screen.getByText(
+        "Nie masz jeszcze żadnej lokalizacji. Dodaj pierwszą przyciskiem plusika powyżej.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -114,8 +116,9 @@ describe("LocationsListPageView", () => {
 
     renderView();
 
-    await userEvent.type(screen.getByLabelText("Nazwa lokalizacji"), "Mieszkanie");
     await userEvent.click(screen.getByRole("button", { name: "Dodaj lokalizację" }));
+    await userEvent.type(screen.getByLabelText("Nazwa lokalizacji"), "Mieszkanie");
+    await userEvent.click(screen.getByRole("button", { name: "Dodaj" }));
 
     expect(createLocationMutate).toHaveBeenCalledWith(
       { name: "Mieszkanie" },

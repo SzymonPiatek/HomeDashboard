@@ -1,6 +1,7 @@
 "use client";
 
 import { NAME_MAX_LENGTH } from "@repo/contracts/locations";
+import { Check, Pencil, X } from "lucide-react";
 import { type FormEvent, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,8 @@ type LocationNameFormProps = {
   currentName: string;
 };
 
-// Nazwa lokalizacji jest nagłówkiem strony (h1) — edycja przełącza go w formularz,
-// bez zmiany struktury nagłówków (.claude/rules/web.md).
+// Nazwa lokalizacji jest nagłówkiem strony (h1) — edycja podmienia go w miejscu
+// na input tej samej wielkości, żeby układ strony się nie przesuwał.
 export function LocationNameForm({ locationId, currentName }: LocationNameFormProps) {
   const updateLocation = useUpdateLocation(locationId);
   const [isEditing, setIsEditing] = useState(false);
@@ -35,43 +36,51 @@ export function LocationNameForm({ locationId, currentName }: LocationNameFormPr
         <Button
           type="button"
           variant="ghost"
-          className="h-11"
+          size="icon"
+          className="size-11"
+          aria-label="Zmień nazwę"
           onClick={() => {
             setName(currentName);
             setIsEditing(true);
           }}
         >
-          Zmień nazwę
+          <Pencil aria-hidden="true" />
         </Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="location-name" className="text-sm font-medium">
-            Nazwa lokalizacji
-          </label>
-          <Input
-            id="location-name"
-            autoFocus
-            value={name}
-            maxLength={NAME_MAX_LENGTH}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <Input
+          aria-label="Nazwa lokalizacji"
+          autoFocus
+          value={name}
+          maxLength={NAME_MAX_LENGTH}
+          onChange={(event) => setName(event.target.value)}
+          required
+          className="h-auto border-0 bg-transparent p-0 text-2xl font-semibold shadow-none"
+        />
         <Button
           type="submit"
-          className="h-11"
+          variant="ghost"
+          size="icon"
+          className="size-11"
+          aria-label="Zapisz"
           disabled={updateLocation.isPending || name.trim().length === 0}
         >
-          {updateLocation.isPending ? "Zapisywanie…" : "Zapisz"}
+          <Check aria-hidden="true" />
         </Button>
-        <Button type="button" variant="ghost" className="h-11" onClick={() => setIsEditing(false)}>
-          Anuluj
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-11"
+          aria-label="Anuluj"
+          onClick={() => setIsEditing(false)}
+        >
+          <X aria-hidden="true" />
         </Button>
       </div>
       {updateLocation.isError ? (

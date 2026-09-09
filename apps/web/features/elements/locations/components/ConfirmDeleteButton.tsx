@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -22,12 +23,13 @@ export function ConfirmDeleteButton({ itemLabel, onConfirm, isPending }: Confirm
     return (
       <Button
         type="button"
-        variant="outline"
-        className="h-11"
+        variant="ghost"
+        size="icon"
+        className="size-11"
         aria-label={`Usuń ${itemLabel}`}
         onClick={() => setIsConfirming(true)}
       >
-        Usuń
+        <Trash2 aria-hidden="true" />
       </Button>
     );
   }

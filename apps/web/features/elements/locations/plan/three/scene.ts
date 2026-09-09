@@ -9,12 +9,21 @@ export const MM_TO_M = 1 / 1000;
 
 export type Disposable = { dispose: () => void };
 
+// Ściana chowana, gdy kamera stoi po jej zewnętrznej stronie względem najbliższego
+// pokoju (updateNearCameraWallVisibility) — wzorem src/three/edge.ts z blueprint3d.
+export type NearCameraWall = {
+  mesh: THREE.Mesh;
+  midpoint: THREE.Vector3;
+  outwardNormal: THREE.Vector3;
+};
+
 export type Scene3D = {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   controls: OrbitControls;
   disposables: Disposable[];
+  nearCameraWalls: NearCameraWall[];
 };
 
 // oklch() z getComputedStyle nie parsuje się w Three.Color — rasteryzujemy przez canvas.
@@ -81,6 +90,62 @@ function addLights(scene: THREE.Scene, box: BoundingBox): void {
   scene.add(directionalLight);
 }
 
+function getWallMidpointM(wall: Wall): THREE.Vector3 {
+  const sum = wall.points.reduce(
+    (acc, point) => acc.add(new THREE.Vector3(point.xMm, 0, point.yMm)),
+    new THREE.Vector3(),
+  );
+  return sum.divideScalar(wall.points.length).multiplyScalar(MM_TO_M);
+}
+
+// Krótszy z dwóch sąsiednich boków prostokąta ściany to jej grubość — już prostopadły
+// do długości ściany, więc jest kandydatem na normalną (kierunek ustalany niżej).
+function getWallThicknessDirection(wall: Wall): THREE.Vector3 {
+  const [p0, p1, p2] = wall.points;
+  const edgeA = new THREE.Vector3(p1.xMm - p0.xMm, 0, p1.yMm - p0.yMm);
+  const edgeB = new THREE.Vector3(p2.xMm - p1.xMm, 0, p2.yMm - p1.yMm);
+  const shorterEdge = edgeA.length() < edgeB.length() ? edgeA : edgeB;
+  return shorterEdge.normalize();
+}
+
+function computeRoomCentroidsM(rooms: Room[]): THREE.Vector3[] {
+  return rooms.map((room) => {
+    const sum = room.vertices.reduce(
+      (acc, vertex) => acc.add(new THREE.Vector3(vertex.xMm, 0, vertex.yMm)),
+      new THREE.Vector3(),
+    );
+    return sum.divideScalar(room.vertices.length).multiplyScalar(MM_TO_M);
+  });
+}
+
+function computeFallbackCentroidM(midpoints: THREE.Vector3[]): THREE.Vector3 {
+  const sum = midpoints.reduce((acc, point) => acc.add(point), new THREE.Vector3());
+  return midpoints.length > 0 ? sum.divideScalar(midpoints.length) : sum;
+}
+
+function findNearestCentroidM(point: THREE.Vector3, centroids: THREE.Vector3[]): THREE.Vector3 {
+  return centroids.reduce((nearest, candidate) =>
+    point.distanceTo(candidate) < point.distanceTo(nearest) ? candidate : nearest,
+  );
+}
+
+// Ściana nie zna "swojego" pokoju (Wall nie ma odniesienia do Room) — najbliższy
+// środek ciężkości pokoju zastępuje przynależność ściany do konkretnej bryły.
+function getWallOutwardNormal(
+  wall: Wall,
+  midpointM: THREE.Vector3,
+  referenceCentroidsM: THREE.Vector3[],
+): THREE.Vector3 {
+  const direction = getWallThicknessDirection(wall);
+  const nearestCentroid = findNearestCentroidM(midpointM, referenceCentroidsM);
+  const towardOutside = new THREE.Vector3().subVectors(midpointM, nearestCentroid);
+
+  if (towardOutside.lengthSq() > 0 && direction.dot(towardOutside) < 0) {
+    direction.negate();
+  }
+  return direction;
+}
+
 function buildWallMesh(wall: Wall, colorCss: string): { mesh: THREE.Mesh } & Disposable {
   const shape = new THREE.Shape(
     wall.points.map((point) => new THREE.Vector2(point.xMm * MM_TO_M, -point.yMm * MM_TO_M)),
@@ -123,23 +188,37 @@ function buildFloorMesh(room: Room, colorCss: string): { mesh: THREE.Mesh } & Di
   };
 }
 
-function addFloorPlanMeshes(scene: THREE.Scene, document: FloorPlanDocument): Disposable[] {
+function addFloorPlanMeshes(
+  scene: THREE.Scene,
+  document: FloorPlanDocument,
+): { disposables: Disposable[]; nearCameraWalls: NearCameraWall[] } {
   const wallColor = resolveCssColor("--foreground");
   const floorColor = resolveCssColor("--muted");
   const disposables: Disposable[] = [];
+  const nearCameraWalls: NearCameraWall[] = [];
 
   for (const room of document.rooms) {
     const floor = buildFloorMesh(room, floorColor);
     scene.add(floor.mesh);
     disposables.push(floor);
   }
+
+  const roomCentroids = computeRoomCentroidsM(document.rooms);
+  const wallMidpoints = document.walls.map((wall) => getWallMidpointM(wall));
+  const referenceCentroids =
+    roomCentroids.length > 0 ? roomCentroids : [computeFallbackCentroidM(wallMidpoints)];
+
   for (const wall of document.walls) {
     const wallMesh = buildWallMesh(wall, wallColor);
     scene.add(wallMesh.mesh);
     disposables.push(wallMesh);
+
+    const midpoint = getWallMidpointM(wall);
+    const outwardNormal = getWallOutwardNormal(wall, midpoint, referenceCentroids);
+    nearCameraWalls.push({ mesh: wallMesh.mesh, midpoint, outwardNormal });
   }
 
-  return disposables;
+  return { disposables, nearCameraWalls };
 }
 
 export function createFloorPlanScene(
@@ -157,9 +236,23 @@ export function createFloorPlanScene(
 
   const controls = createControls(camera, renderer, box);
   addLights(scene, box);
-  const disposables = addFloorPlanMeshes(scene, document);
+  const { disposables, nearCameraWalls } = addFloorPlanMeshes(scene, document);
 
-  return { scene, camera, renderer, controls, disposables };
+  return { scene, camera, renderer, controls, disposables, nearCameraWalls };
+}
+
+const scratchDirectionToCamera = new THREE.Vector3();
+
+// Wywoływane co klatkę (FloorPlanView3D) — jedna reużywana Vector3 zamiast alokacji
+// na każdą ścianę, żeby pętla animacji nie generowała śmieci dla GC.
+export function updateNearCameraWallVisibility(
+  camera: THREE.Camera,
+  walls: NearCameraWall[],
+): void {
+  for (const wall of walls) {
+    scratchDirectionToCamera.subVectors(camera.position, wall.midpoint).normalize();
+    wall.mesh.visible = wall.outwardNormal.dot(scratchDirectionToCamera) < 0;
+  }
 }
 
 export function resizeFloorPlanScene(
