@@ -170,6 +170,7 @@ export function useFloorPlanEditor(
     handleShapePointerDown: shapeDrag.handleShapePointerDown,
     handleShapeKeyDown,
     handleShapeFocus: setSelection,
+    handleDeleteSelection: () => handleDeleteSelection(selection),
     handleUndo,
     handleRedo,
     handleRoomNameConfirm: drawing.confirmRoomName,

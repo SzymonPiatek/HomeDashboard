@@ -38,6 +38,8 @@ function FloorPlanEditor({
       <EditorToolbar
         tool={editor.tool}
         onToolChange={editor.handleToolChange}
+        hasSelection={editor.selection !== null}
+        onDeleteSelection={editor.handleDeleteSelection}
         canUndo={editor.canUndo}
         onUndo={editor.handleUndo}
         canRedo={editor.canRedo}

@@ -1,6 +1,6 @@
 "use client";
 
-import { MousePointer2, Redo2, Save, Undo2 } from "lucide-react";
+import { MousePointer2, Redo2, Save, Trash2, Undo2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,8 @@ import type { EditorTool } from "./types";
 type EditorToolbarProps = {
   tool: EditorTool;
   onToolChange: (tool: EditorTool) => void;
+  hasSelection: boolean;
+  onDeleteSelection: () => void;
   canUndo: boolean;
   onUndo: () => void;
   canRedo: boolean;
@@ -27,6 +29,8 @@ const TOOL_BUTTONS: { tool: EditorTool; label: string; icon: typeof MousePointer
 export function EditorToolbar({
   tool,
   onToolChange,
+  hasSelection,
+  onDeleteSelection,
   canUndo,
   onUndo,
   canRedo,
@@ -52,6 +56,18 @@ export function EditorToolbar({
           <item.icon aria-hidden="true" />
         </Button>
       ))}
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="size-11"
+        aria-label="Usuń zaznaczone"
+        tooltip="Usuń zaznaczone"
+        disabled={!hasSelection}
+        onClick={onDeleteSelection}
+      >
+        <Trash2 aria-hidden="true" />
+      </Button>
       <Button
         type="button"
         variant="ghost"

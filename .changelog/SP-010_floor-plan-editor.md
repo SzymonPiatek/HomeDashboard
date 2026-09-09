@@ -19,6 +19,7 @@ Prowadzone na bieżąco.
 | ---- | ------ | ------ |
 | 2026-09-09 | `plan/FloorPlanView2D.tsx` | Zaznaczanie ściany/pokoju w widoku 2D (klik oraz Tab, `aria-pressed`, podświetlenie kolorem akcentu) — pierwszy krok edytora, bez rysowania, przesuwania, usuwania ani zapisu. |
 | 2026-09-09 | `plan/FloorPlanView2D.tsx`, `plan/StaticFloorPlanView.tsx` (nowy), `plan/editor/**` (nowy), `plan/FloorPlanViewControls.tsx`, `LevelPlanPageView.tsx`, `api/use-floor-plan.ts`, `packages/contracts/src/floor-plan.ts` | Tryb edycji rzutu: przycisk (ikona `PencilRuler`, odróżniona od ołówka zmiany nazwy w nagłówku) obok przełącznika 2D/3D, widoczny tylko w 2D. Po włączeniu pokazuje pasek: narzędzie „Zaznacz” (na razie jedyne), „Zapisz rzut” (aktywny, gdy jest różnica względem zapisanej wersji), „Cofnij”/„Ponów”. Poza trybem edycji widok zostaje czysto wizualny (`StaticFloorPlanView`) z tym samym zaznaczaniem co dotąd. |
+| 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/editor/use-floor-plan-editor.ts` | Przycisk „Usuń zaznaczone” (kosz) w toolbarze, obok narzędzia „Zaznacz” — aktywny tylko gdy coś jest zaznaczone; ta sama akcja co dotąd pod klawiszem Delete/Backspace. |
 
 ## Decyzje podjęte po drodze
 
@@ -28,14 +29,13 @@ Prowadzone na bieżąco.
 - Cofanie/ponawianie: `history` (przeszłość) i `future` (przyszłość) jako dwa stosy
   dokumentów; każda nowa edycja czyści `future` (standardowe zachowanie undo/redo).
   Zapis czyści oba stosy — nie da się cofnąć do stanu sprzed ostatniego zapisu.
-- Toolbar na razie ma tylko narzędzie „Zaznacz” i nie ma przycisku usuwania zaznaczenia —
-  usuwanie działa klawiszem Delete/Backspace na zaznaczonym elemencie. Rysowanie ściany/
-  pokoju i przycisk usuwania wracają, gdy będą gotowe.
+- Toolbar na razie ma tylko narzędzie „Zaznacz” — rysowanie ściany/pokoju wraca, gdy
+  będzie gotowe.
 
 ## Świadomie pominięte
 
-- Narzędzia „Dodaj ścianę”/„Dodaj pokój” w toolbarze i przycisk usuwania zaznaczenia —
-  BL-020 dalej otwarte, wracają w kolejnych commitach na tej gałęzi.
+- Narzędzia „Dodaj ścianę”/„Dodaj pokój” w toolbarze — BL-020 dalej otwarte, wracają
+  w kolejnych commitach na tej gałęzi.
 
 ## Wpływ na wdrożenie
 
