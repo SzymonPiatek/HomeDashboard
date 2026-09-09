@@ -13,19 +13,20 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.95 0 0);
+    /* .claude/rules/ui-quality.md */
+    --primary: oklch(0.8 0.16 55);
+    --primary-foreground: oklch(0.145 0 0);
+    --secondary: oklch(0.95 0.008 55);
     --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.95 0 0);
-    --muted-foreground: oklch(0.45 0 0);
-    --accent: oklch(0.95 0 0);
+    --muted: oklch(0.95 0.008 55);
+    --muted-foreground: oklch(0.45 0.01 50);
+    --accent: oklch(0.95 0.008 55);
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(0.51 0.21 27.3);
     --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.65 0 0);
-    --input: oklch(0.65 0 0);
-    --ring: oklch(0.55 0 0);
+    --border: oklch(0.65 0.01 50);
+    --input: oklch(0.65 0.01 50);
+    --ring: oklch(0.55 0.19 41);
   }
 
   /* Wyniesienie warstw pokazujemy jaśniejszym tłem, nie cieniem — .claude/rules/web.md. */
@@ -36,19 +37,20 @@
     --card-foreground: oklch(0.97 0 0);
     --popover: oklch(0.22 0 0);
     --popover-foreground: oklch(0.97 0 0);
-    --primary: oklch(0.92 0 0);
-    --primary-foreground: oklch(0.2 0 0);
-    --secondary: oklch(0.28 0 0);
+    /* Ten sam akcent, rozjaśniony zamiast przyciemniony — w ciemnym motywie primary jest jasną plamą na ciemnym tle. */
+    --primary: oklch(0.78 0.14 55);
+    --primary-foreground: oklch(0.18 0 0);
+    --secondary: oklch(0.3 0.02 50);
     --secondary-foreground: oklch(0.97 0 0);
-    --muted: oklch(0.28 0 0);
-    --muted-foreground: oklch(0.75 0 0);
-    --accent: oklch(0.28 0 0);
+    --muted: oklch(0.3 0.02 50);
+    --muted-foreground: oklch(0.75 0.02 50);
+    --accent: oklch(0.3 0.02 50);
     --accent-foreground: oklch(0.97 0 0);
     --destructive: oklch(0.72 0.17 25);
     --destructive-foreground: oklch(0.18 0 0);
-    --border: oklch(0.52 0 0);
-    --input: oklch(0.52 0 0);
-    --ring: oklch(0.7 0 0);
+    --border: oklch(0.52 0.02 50);
+    --input: oklch(0.52 0.02 50);
+    --ring: oklch(0.75 0.14 50);
   }
 
   :root {
