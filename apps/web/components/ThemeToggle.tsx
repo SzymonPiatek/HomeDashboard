@@ -1,8 +1,9 @@
 "use client";
 
+import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
 
 function persistTheme(theme: Theme): void {
@@ -30,15 +31,19 @@ export function ThemeToggle() {
     setIsDark(nextIsDark);
   }
 
+  const label = isDark ? "Przełącz na tryb jasny" : "Przełącz na tryb ciemny";
+
   return (
     <Button
       type="button"
-      variant="outline"
-      size="sm"
+      variant="ghost"
+      size="icon"
+      className="size-11"
       onClick={toggleTheme}
       disabled={isDark === null}
+      aria-label={label}
     >
-      {isDark ? "Tryb jasny" : "Tryb ciemny"}
+      {isDark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
     </Button>
   );
 }

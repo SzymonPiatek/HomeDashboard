@@ -20,24 +20,26 @@ describe("ThemeToggle", () => {
   it("pokazuje etykietę włączenia trybu ciemnego, gdy motyw jest jasny", async () => {
     render(<ThemeToggle />);
 
-    expect(await screen.findByRole("button", { name: "Tryb ciemny" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Przełącz na tryb ciemny" }),
+    ).toBeInTheDocument();
   });
 
   it("po kliknięciu dodaje klasę dark do <html> i zapamiętuje wybór", async () => {
     render(<ThemeToggle />);
 
-    await userEvent.click(await screen.findByRole("button", { name: "Tryb ciemny" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Przełącz na tryb ciemny" }));
 
     await waitFor(() => expect(document.documentElement.classList.contains("dark")).toBe(true));
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("dark");
-    expect(screen.getByRole("button", { name: "Tryb jasny" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Przełącz na tryb jasny" })).toBeInTheDocument();
   });
 
   it("kliknięte ponownie zdejmuje klasę dark i zapamiętuje jasny motyw", async () => {
     document.documentElement.classList.add("dark");
     render(<ThemeToggle />);
 
-    await userEvent.click(await screen.findByRole("button", { name: "Tryb jasny" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Przełącz na tryb jasny" }));
 
     await waitFor(() => expect(document.documentElement.classList.contains("dark")).toBe(false));
     expect(window.localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
