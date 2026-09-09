@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 import { useSession } from "../api/use-session";
@@ -38,7 +38,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
         <p role="alert" className="text-destructive">
           Nie udało się sprawdzić sesji. Sprawdź połączenie z siecią i spróbuj ponownie.
         </p>
-        <Button type="button" onClick={() => session.refetch()}>
+        <Button type="button" className="h-11" onClick={() => session.refetch()}>
           Spróbuj ponownie
         </Button>
       </div>
