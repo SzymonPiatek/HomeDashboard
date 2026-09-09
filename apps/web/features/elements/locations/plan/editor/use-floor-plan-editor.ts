@@ -12,6 +12,8 @@ import {
   createWall,
   removeRoom,
   removeWall,
+  snapWallAngle,
+  snapWallStartToBoundary,
   translateRoom,
   translateWall,
   updateRoom,
@@ -34,6 +36,7 @@ export function useFloorPlanEditor(
   initial: FloorPlanDocument,
 ) {
   const [draft, setDraft] = useState(initial);
+  const [savedDocument, setSavedDocument] = useState(initial);
   const [history, setHistory] = useState<FloorPlanDocument[]>([]);
   const [future, setFuture] = useState<FloorPlanDocument[]>([]);
   const [tool, setTool] = useState<EditorTool>("select");
@@ -60,6 +63,8 @@ export function useFloorPlanEditor(
 
   const drawing = useDraftDrawing({
     tool,
+    resolveWallStart: (point) => snapWallStartToBoundary(point, draft),
+    resolveWallEnd: snapWallAngle,
     onWallReady: (start, end) => {
       const wall = createWall(start, end, DEFAULT_WALL_THICKNESS_MM);
       commitDraft((current) => addWall(current, wall));
@@ -85,7 +90,10 @@ export function useFloorPlanEditor(
 
   function handleCanvasPointerMove(point: Point) {
     const handledByDrag = shapeDrag.handlePointerMove(point);
-    if (!handledByDrag && (tool === "wall" || tool === "room")) {
+    if (handledByDrag) return;
+    if (tool === "wall") {
+      drawing.updateWallCursor(point);
+    } else if (tool === "room") {
       drawing.setCursorPoint(point);
     }
   }
@@ -140,10 +148,18 @@ export function useFloorPlanEditor(
     setSelection(null);
   }
 
+  function handleDiscardChanges() {
+    setDraft(savedDocument);
+    setHistory([]);
+    setFuture([]);
+    setSelection(null);
+  }
+
   function handleSave() {
     putFloorPlan.mutate(draft, {
       onSuccess: (saved) => {
         setDraft(saved);
+        setSavedDocument(saved);
         setHistory([]);
         setFuture([]);
       },
@@ -158,7 +174,7 @@ export function useFloorPlanEditor(
     roomDraftVertices: drawing.roomDraftVertices,
     pendingRoomVertices: drawing.pendingRoomVertices,
     cursorPoint: drawing.cursorPoint,
-    isDirty: draft !== initial,
+    isDirty: draft !== savedDocument,
     canUndo: history.length > 0,
     canRedo: future.length > 0,
     isSaving: putFloorPlan.isPending,
@@ -175,6 +191,7 @@ export function useFloorPlanEditor(
     handleRedo,
     handleRoomNameConfirm: drawing.confirmRoomName,
     handleRoomNameCancel: drawing.cancelRoomName,
+    handleDiscardChanges,
     handleSave,
   };
 }

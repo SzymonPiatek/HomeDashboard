@@ -21,6 +21,9 @@ Prowadzone na bieżąco.
 | 2026-09-09 | `plan/FloorPlanView2D.tsx`, `plan/StaticFloorPlanView.tsx` (nowy), `plan/editor/**` (nowy), `plan/FloorPlanViewControls.tsx`, `LevelPlanPageView.tsx`, `api/use-floor-plan.ts`, `packages/contracts/src/floor-plan.ts` | Tryb edycji rzutu: przycisk (ikona `PencilRuler`, odróżniona od ołówka zmiany nazwy w nagłówku) obok przełącznika 2D/3D, widoczny tylko w 2D. Po włączeniu pokazuje pasek: narzędzie „Zaznacz” (na razie jedyne), „Zapisz rzut” (aktywny, gdy jest różnica względem zapisanej wersji), „Cofnij”/„Ponów”. Poza trybem edycji widok zostaje czysto wizualny (`StaticFloorPlanView`) z tym samym zaznaczaniem co dotąd. |
 | 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/editor/use-floor-plan-editor.ts` | Przycisk „Usuń zaznaczone” (kosz) w toolbarze, obok narzędzia „Zaznacz” — aktywny tylko gdy coś jest zaznaczone; ta sama akcja co dotąd pod klawiszem Delete/Backspace. |
 | 2026-09-09 | `components/ui/alert-dialog.tsx` (nowy), `components/ConfirmDeleteButton.tsx`, `LocationDetailPageView.tsx`, `LevelPlanPageView.tsx` | Potwierdzenie usunięcia lokalizacji/poziomu przeniesione z rozwijanego bloku obok kosza do modala (`@radix-ui/react-alert-dialog`) — mniej miejsca w nagłówku, ten sam wymóg jawnego potwierdzenia. Przyciski „Anuluj”/„Potwierdź” mają wymuszony jednakowy rozmiar (`h-11 w-28`). |
+| 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/geometry/edit-geometry.ts`, `plan/editor/use-draft-drawing.ts`, `plan/editor/use-floor-plan-editor.ts` | Narzędzie „Dodaj ścianę” w toolbarze. Kąt nowej ściany przyciągnięty na sztywno do wielokrotności 45° (długość zachowana); punkt startowy przyciągnięty do granicy najbliższej istniejącej ściany/pokoju, a przy pustym rzucie wymuszony na (0, 0). |
+| 2026-09-09 | `plan/editor/use-floor-plan-editor.ts` | Naprawa: „Zapisz rzut” zostawał aktywny na stałe po pierwszej edycji, bo `isDirty` porównywał z dokumentem sprzed montowania komponentu, nie z ostatnio zapisaną wersją. |
+| 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/editor/use-floor-plan-editor.ts` | „Zapisz rzut” jako sama ikona; obok nowy przycisk „X” („Odrzuć zmiany”) — cofa cały niezapisany szkic do ostatnio zapisanej wersji i czyści historię cofania/ponawiania. |
 
 ## Decyzje podjęte po drodze
 
@@ -42,8 +45,8 @@ Prowadzone na bieżąco.
 
 ## Świadomie pominięte
 
-- Narzędzia „Dodaj ścianę”/„Dodaj pokój” w toolbarze — BL-020 dalej otwarte, wracają
-  w kolejnych commitach na tej gałęzi.
+- Narzędzie „Dodaj pokój” w toolbarze — BL-020 dalej otwarte, wraca w kolejnych
+  commitach na tej gałęzi.
 
 ## Wpływ na wdrożenie
 

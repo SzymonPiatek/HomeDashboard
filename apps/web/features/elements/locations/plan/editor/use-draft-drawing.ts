@@ -11,11 +11,19 @@ const ROOM_CLOSE_THRESHOLD_MM = SNAP_GRID_MM * 3;
 
 type UseDraftDrawingArgs = {
   tool: EditorTool;
+  resolveWallStart: (point: Point) => Point;
+  resolveWallEnd: (start: Point, point: Point) => Point;
   onWallReady: (start: Point, end: Point) => void;
   onRoomReady: (vertices: Point[], name: string) => void;
 };
 
-export function useDraftDrawing({ tool, onWallReady, onRoomReady }: UseDraftDrawingArgs) {
+export function useDraftDrawing({
+  tool,
+  resolveWallStart,
+  resolveWallEnd,
+  onWallReady,
+  onRoomReady,
+}: UseDraftDrawingArgs) {
   const [wallDraftStart, setWallDraftStart] = useState<Point | null>(null);
   const [roomDraftVertices, setRoomDraftVertices] = useState<Point[]>([]);
   const [pendingRoomVertices, setPendingRoomVertices] = useState<Point[] | null>(null);
@@ -29,13 +37,18 @@ export function useDraftDrawing({ tool, onWallReady, onRoomReady }: UseDraftDraw
 
   function handleWallPoint(point: Point) {
     if (!wallDraftStart) {
-      setWallDraftStart(point);
+      setWallDraftStart(resolveWallStart(point));
       return;
     }
-    if (distanceMm(wallDraftStart, point) >= MIN_WALL_LENGTH_MM) {
-      onWallReady(wallDraftStart, point);
+    const end = resolveWallEnd(wallDraftStart, point);
+    if (distanceMm(wallDraftStart, end) >= MIN_WALL_LENGTH_MM) {
+      onWallReady(wallDraftStart, end);
     }
     setWallDraftStart(null);
+  }
+
+  function updateWallCursor(point: Point) {
+    setCursorPoint(wallDraftStart ? resolveWallEnd(wallDraftStart, point) : point);
   }
 
   function closeRoomLoop(vertices: Point[]) {
@@ -87,6 +100,7 @@ export function useDraftDrawing({ tool, onWallReady, onRoomReady }: UseDraftDraw
     pendingRoomVertices,
     cursorPoint,
     setCursorPoint,
+    updateWallCursor,
     resetDrafts,
     handlePointerDown,
     confirmRoomName,

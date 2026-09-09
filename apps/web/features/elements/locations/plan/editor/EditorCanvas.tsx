@@ -1,6 +1,7 @@
 "use client";
 
 import type { FloorPlanDocument, Point, Room, Wall } from "@repo/contracts/floor-plan";
+import { DEFAULT_WALL_THICKNESS_MM } from "@repo/contracts/floor-plan";
 import { useRef } from "react";
 
 import { buildWallCornersFromCenterline } from "../geometry/edit-geometry";
@@ -10,7 +11,6 @@ import type { EditorSelection, EditorTool } from "./types";
 
 const VIEW_PADDING_MM = 400;
 const MIN_VIEW_SIZE_MM = 2000;
-const DRAFT_THICKNESS_MM = 200;
 const ROOM_PREVIEW_STROKE_MM = 20;
 
 function toPolygonPoints(points: readonly Point[]): string {
@@ -124,7 +124,7 @@ export function EditorCanvas({
 
   const wallPreview =
     tool === "wall" && wallDraftStart && cursorPoint
-      ? buildWallCornersFromCenterline(wallDraftStart, cursorPoint, DRAFT_THICKNESS_MM)
+      ? buildWallCornersFromCenterline(wallDraftStart, cursorPoint, DEFAULT_WALL_THICKNESS_MM)
       : null;
   const roomPreview =
     tool === "room" && roomDraftVertices.length > 0

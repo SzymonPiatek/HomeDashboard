@@ -47,6 +47,7 @@ function FloorPlanEditor({
         isDirty={editor.isDirty}
         isSaving={editor.isSaving}
         onSave={editor.handleSave}
+        onDiscard={editor.handleDiscardChanges}
       />
       {editor.saveError ? (
         <p role="alert" className="text-sm text-destructive">

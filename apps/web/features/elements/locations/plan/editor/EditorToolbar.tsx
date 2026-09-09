@@ -1,6 +1,6 @@
 "use client";
 
-import { MousePointer2, Redo2, Save, Trash2, Undo2 } from "lucide-react";
+import { MousePointer2, PenLine, Redo2, Save, Trash2, Undo2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,11 +19,13 @@ type EditorToolbarProps = {
   isDirty: boolean;
   isSaving: boolean;
   onSave: () => void;
+  onDiscard: () => void;
 };
 
-// Na razie jedyne narzędzie — "Dodaj ścianę"/"Dodaj pokój" dołączą tu, gdy będą gotowe.
+// "Dodaj pokój" dołączy tu, gdy będzie gotowe.
 const TOOL_BUTTONS: { tool: EditorTool; label: string; icon: typeof MousePointer2 }[] = [
   { tool: "select", label: "Zaznacz", icon: MousePointer2 },
+  { tool: "wall", label: "Dodaj ścianę", icon: PenLine },
 ];
 
 export function EditorToolbar({
@@ -38,6 +40,7 @@ export function EditorToolbar({
   isDirty,
   isSaving,
   onSave,
+  onDiscard,
 }: EditorToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -94,13 +97,27 @@ export function EditorToolbar({
       </Button>
       <Button
         type="button"
+        variant="ghost"
+        size="icon"
+        className="ml-auto size-11"
+        aria-label="Odrzuć zmiany"
+        tooltip="Odrzuć zmiany"
+        disabled={!isDirty || isSaving}
+        onClick={onDiscard}
+      >
+        <X aria-hidden="true" />
+      </Button>
+      <Button
+        type="button"
         variant="outline"
-        className="ml-auto h-11 gap-2"
+        size="icon"
+        className="size-11"
+        aria-label={isSaving ? "Zapisywanie…" : "Zapisz rzut"}
+        tooltip={isSaving ? "Zapisywanie…" : "Zapisz rzut"}
         disabled={!isDirty || isSaving}
         onClick={onSave}
       >
-        <Save aria-hidden="true" className="size-4" />
-        {isSaving ? "Zapisywanie…" : "Zapisz rzut"}
+        <Save aria-hidden="true" />
       </Button>
     </div>
   );

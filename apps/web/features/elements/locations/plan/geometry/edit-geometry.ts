@@ -13,6 +13,69 @@ export function distanceMm(a: Point, b: Point): number {
   return Math.hypot(b.xMm - a.xMm, b.yMm - a.yMm);
 }
 
+function closestPointOnSegment(point: Point, a: Point, b: Point): Point {
+  const abx = b.xMm - a.xMm;
+  const aby = b.yMm - a.yMm;
+  const lengthSq = abx * abx + aby * aby;
+  if (lengthSq === 0) return a;
+
+  const t = Math.max(
+    0,
+    Math.min(1, ((point.xMm - a.xMm) * abx + (point.yMm - a.yMm) * aby) / lengthSq),
+  );
+  return { xMm: Math.round(a.xMm + t * abx), yMm: Math.round(a.yMm + t * aby) };
+}
+
+function collectBoundaryEdges(document: FloorPlanDocument): [Point, Point][] {
+  const edges: [Point, Point][] = [];
+  for (const wall of document.walls) {
+    const [p1, p2, p3, p4] = wall.points;
+    edges.push([p1, p2], [p2, p3], [p3, p4], [p4, p1]);
+  }
+  for (const room of document.rooms) {
+    const vertices = room.vertices;
+    for (let index = 0; index < vertices.length; index++) {
+      const current = vertices[index];
+      const next = vertices[(index + 1) % vertices.length];
+      if (current && next) edges.push([current, next]);
+    }
+  }
+  return edges;
+}
+
+// Ściana zaczyna się od granicy istniejącej ściany albo pokoju — punkty (0,0),
+// gdy rzut jest jeszcze pusty. Uproszczenie na start (BL-020, hardkodowane 45°/granica).
+export function snapWallStartToBoundary(point: Point, document: FloorPlanDocument): Point {
+  const edges = collectBoundaryEdges(document);
+  let closest: Point | null = null;
+  let closestDistance = Infinity;
+  for (const [a, b] of edges) {
+    const candidate = closestPointOnSegment(point, a, b);
+    const candidateDistance = distanceMm(point, candidate);
+    if (candidateDistance < closestDistance) {
+      closest = candidate;
+      closestDistance = candidateDistance;
+    }
+  }
+  return snapPointToGrid(closest ?? { xMm: 0, yMm: 0 });
+}
+
+// Kąt odcinka od `start` do `target` przyciągnięty do wielokrotności 45°,
+// z zachowaniem długości odcinka.
+export function snapWallAngle(start: Point, target: Point): Point {
+  const dx = target.xMm - start.xMm;
+  const dy = target.yMm - start.yMm;
+  const length = Math.hypot(dx, dy);
+  if (length === 0) return start;
+
+  const angleStep = Math.PI / 4;
+  const angle = Math.round(Math.atan2(dy, dx) / angleStep) * angleStep;
+  return snapPointToGrid({
+    xMm: Math.round(start.xMm + Math.cos(angle) * length),
+    yMm: Math.round(start.yMm + Math.sin(angle) * length),
+  });
+}
+
 // Zapisywane są tylko cztery rogi (ADR-0010) — grubość istnieje wyłącznie tu,
 // w trakcie budowania prostokąta z odcinka osi.
 export function buildWallCornersFromCenterline(
