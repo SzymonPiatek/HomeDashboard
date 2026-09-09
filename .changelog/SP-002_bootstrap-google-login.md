@@ -18,6 +18,7 @@ pierwotnie w PRD.
 | 2026-09-09 | discovery | Decyzja: logowanie Google zastępuje hasło+2FA e-mail (US-1 zaktualizowane w PRD) |
 | 2026-09-09 | ops | `envs/` (shared/api/web/db `.env.example` + `README.md`), `docker-compose.yml` (dev, wyłącznie baza Postgres), `.gitignore` rozszerzony o `envs/*.env` i artefakty budowania |
 | 2026-09-09 | dane | `apps/api/prisma/schema/{schema,account,session}.prisma` — modele `Account` i `Session` (ADR-0001, ADR-0003); pierwsza migracja `init_account_session`; `prisma.config.ts` uzupełniony o `datasource.url`/`migrations.path` (Prisma 7); `@prisma/client` + `@prisma/adapter-pg` dodane do `apps/api`; `onlyBuiltDependencies` w `pnpm-workspace.yaml` (engine Prismy) |
+| 2026-09-09 | web | Poprawki code review: skrypt inline w `<head>` (`app/layout.tsx`) ustawia klasę `dark` przed pierwszym malowaniem z `localStorage["theme"]`, w jego braku `matchMedia`; nowy `ThemeToggle` (`components/ThemeToggle.tsx`) na `/login` i `/` zapisujący wybór pod tym samym kluczem (`lib/theme.ts`); `useLogout` (`features/auth/api/use-logout.ts`) przekierowuje do `/login` i unieważnia sesję też przy błędzie wylogowania, `LogoutButton` pokazuje komunikat `role="alert"` |
 
 ## Decyzje podjęte po drodze
 
@@ -70,8 +71,13 @@ pierwotnie w PRD.
   (pusta baza, zero danych do utraty — brak ryzyka).
 - **Nowe zmienne środowiskowe:** tak — `DATABASE_URL`, `PORT`, `GOOGLE_CLIENT_ID`,
   `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `OWNER_EMAIL`,
-  `SESSION_COOKIE_SECRET` w `envs/api.env.example`; `POSTGRES_USER`,
-  `POSTGRES_PASSWORD`, `POSTGRES_DB` w `envs/db.env.example`. Szczegóły i powód
+  `SESSION_TTL_KIOSK_DAYS`, `SESSION_TTL_STANDARD_DAYS`, `COOKIE_SECURE`
+  w `envs/api.env.example`; `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+  w `envs/db.env.example`. Nie ma `SESSION_COOKIE_SECRET` — sesja nie jest
+  podpisywana, tylko losowa (ADR-0003), zmienna ta nigdy nie istniała w
+  `env.ts`. `COOKIE_SECURE` jest wymagana (bez wartości domyślnej) po poprawce
+  code review z 2026-09-09 — brak jej w konfiguracji zatrzymuje start procesu
+  zamiast po cichu wyłączać `Secure` na ciasteczku sesji. Szczegóły i powód
   każdej w `envs/README.md`.
 - **Przebudowanie obrazu:** nie dotyczy jeszcze (brak obrazu produkcyjnego na tym etapie)
 - **Przerwa w działaniu:** nie dotyczy (pierwsze wdrożenie)
@@ -113,6 +119,18 @@ smoke test przez `PrismaClient` z `PrismaPg` — utworzenie `Account` + `Session
 usunięcie `Account` kasuje kaskadowo `Session` (`onDelete: Cascade`), unikalność
 `googleSub`/`tokenHash` wymuszona przez bazę. Baza po teście pusta (0 wierszy
 w obu tabelach).
+
+## Uwaga do środowiska (nie dotyczy kodu)
+
+Ręczna weryfikacja motywu robiona przez `frontend-dev` 2026-09-09: w tym środowisku
+sandboksowym `pnpm dev` (Turbopack) ma nieudany handshake WebSocketa HMR
+(`ERR_INVALID_HTTP_RESPONSE`), przez co żadne efekty klienckie (React `useEffect`,
+w tym przekierowanie w `AuthGate`) nie odpalają w przeglądarce sterowanej przez
+Playwright — wygląda na ograniczenie sieciowe/proxy tego środowiska, nie błąd w
+kodzie. Zweryfikowano zamiast tego przeciwko `next build && next start` (bez HMR),
+gdzie wszystko — inicjalizacja motywu, `ThemeToggle`, trwałość w `localStorage` —
+działało poprawnie w obu motywach. Jeśli kolejny agent w tym samym środowisku
+zobaczy "martwy" klienta pod `pnpm dev`, to prawdopodobnie ten sam objaw, nie regresja.
 
 ## Ryzyka
 
