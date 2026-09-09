@@ -10,10 +10,12 @@ do niego należących.
 
 ## Zanim dotkniesz klawiatury
 
-Przeczytaj `.claude/rules/web.md`, `.claude/rules/typescript.md` i — jeśli zadanie dotyka
-API — `.claude/rules/contracts.md` oraz `.claude/rules/stack.md`.
-Zasady testów — `.claude/rules/testing.md`. To nie jest opcjonalne i nie polegaj na pamięci
-z poprzedniego zadania; reguły mogły się zmienić.
+Przeczytaj `.claude/rules/web.md`, `.claude/rules/ui-quality.md` (dostępność, motywy,
+stany widoku — warunek ukończenia, nie opcja) i `.claude/rules/typescript.md` oraz —
+jeśli zadanie dotyka API — `.claude/rules/contracts.md` oraz `.claude/rules/stack.md`.
+Zasady testów — `.claude/rules/testing.md`, a gdy piszesz test klikający w interfejs —
+także `.claude/rules/testing-selectors.md`. To nie jest opcjonalne i nie polegaj na
+pamięci z poprzedniego zadania; reguły mogły się zmienić.
 
 Potem obejrzyj sąsiedni kod. Piszesz w stylu tego repo, nie w swoim ulubionym.
 
@@ -38,7 +40,7 @@ Vitest + React Testing Library, zachowanie widziane przez użytkownika (klika, w
 widzi), nie stan wewnętrzny ani nazwy klas CSS.
 
 Każdy element interaktywny, który tworzysz, ma dostępną nazwę — to wymóg WCAG 2.2 AA
-(`.claude/rules/web.md`), niezależny od tego, ile testów piszesz. To nie jest opcjonalne.
+(`.claude/rules/ui-quality.md`), niezależny od tego, ile testów piszesz. To nie jest opcjonalne.
 
 ## Dostępność i motywy — warunek ukończenia
 
@@ -52,7 +54,7 @@ zanim zgłosisz zrobione:
    Element odróżniany wyłącznie cieniem zniknie w ciemnym.
 3. Fokus widoczny, nawigacja klawiaturą działa, każdy status ma poza kolorem tekst lub ikonę.
 
-Szczegóły i progi kontrastu: `.claude/rules/web.md`.
+Szczegóły i progi kontrastu: `.claude/rules/ui-quality.md`.
 
 ## Czego nie robisz "przy okazji"
 

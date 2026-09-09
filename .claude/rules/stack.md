@@ -39,16 +39,15 @@ Wynikają z powyższego wyboru i obowiązują każdego agenta:
 
 ## Rozstrzygnięcia towarzyszące
 
-- **Auth mieszka w całości w `apps/api`** — logowanie, sesje, OAuth. Sesja w ciasteczku
-  HttpOnly. Jedno miejsce, w którym żyje bezpieczeństwo.
-- **Reverse proxy stawia oba serwisy pod jedną domeną** (`/` → web, `/api` → api),
-  dzięki czemu ciasteczka HttpOnly działają bez obchodzenia CORS.
-- **Motywy jasny i ciemny obowiązkowo**, oparte na semantycznych tokenach jako zmiennych
-  CSS, przełączanych klasą `dark` na `html` (konwencja shadcn/ui). Szczegóły w `web.md`.
-- **WCAG 2.2 poziom AA jest wymogiem projektu**, nie opcją.
-- **Server Actions i route handlery nie są drogą do danych**, mimo że App Router je oferuje.
-- **`$queryRaw` dopuszczalne wyłącznie w warstwie repozytorium**, z parametrami i z komentarzem
-  wyjaśniającym, czemu Prisma nie wystarczyła.
+Spis, nie treść — każda z tych decyzji ma pełny opis w pliku, który jest jej właścicielem.
+Czytaj ten plik tylko wtedy, gdy zadanie faktycznie go dotyczy:
+
+- Auth w całości w `apps/api`, sesja w ciasteczku HttpOnly → `.claude/rules/api.md`,
+  `.claude/rules/auth.md`.
+- Reverse proxy pod jedną domeną (`/` → web, `/api` → api) → `.claude/rules/ops.md`.
+- WCAG 2.2 AA i tryb jasny/ciemny → `.claude/rules/ui-quality.md`.
+- Server Actions i route handlery nie są drogą do danych → `.claude/rules/web.md`.
+- `$queryRaw` wyłącznie w warstwie repozytorium, z parametrami → `.claude/rules/data.md`.
 
 ## Czego tu celowo nie ma
 

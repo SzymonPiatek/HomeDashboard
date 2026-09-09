@@ -97,19 +97,3 @@ stronicowania jest niedokończony, nawet gdy dziś rekordów jest pięć.
 
 Każde wywołanie cudzego API ma **timeout** i jawną obsługę porażki. Zewnętrzna usługa,
 która nie odpowiada, nie może zawiesić Twojego endpointu.
-
-## Poświadczenie OVH wklejane przez użytkownika (ADR-0024, ADR-0025)
-
-- **Konfiguracja instalacji nie zawiera nic, co daje dostęp do OVH.** Jedyną zmienną `OVH_*`
-  jest `OVH_CREDENTIAL_ENC_KEY`. Pojawienie się `OVH_APPLICATION_KEY`, `OVH_APPLICATION_SECRET`,
-  `OVH_CONNECT_REDIRECT_URI` albo `OVH_API_BASE_URL` jest błędem.
-- **Sekret aplikacji i klucz konsumenta nie występują w żadnej odpowiedzi HTTP, w logu ani
-  w typie domenowym repozytorium** — w bazie wyłącznie zaszyfrowane (AES-256-GCM).
-- **Region wybiera się z zamkniętej listy** (`ovh-eu`, `ovh-ca`, `ovh-us`). Adres bazowy
-  pochodzący z wejścia użytkownika jest błędem bezpieczeństwa (SSRF), choćby działał.
-- **Zapis poświadczenia jest poprzedzony podpisanym `GET /auth/currentCredential`** i następuje
-  tylko wtedy, gdy przyznane reguły są dokładnie zestawem wymaganym: każda wymagana ścieżka
-  pokryta **i** żadna przyznana reguła spoza `OVH_ALLOWED_PATHS` ani z metodą inną niż `GET`.
-  Odrzucony komplet nie tworzy wiersza i nie zapisuje sekretu.
-- **`OVH_ALLOWED_PATHS` jest jedynym źródłem obu sprawdzeń** i jedyną listą ścieżek, do których
-  moduł umie sięgnąć. Metoda HTTP nie jest argumentem interfejsu modułu (ADR-0016).
