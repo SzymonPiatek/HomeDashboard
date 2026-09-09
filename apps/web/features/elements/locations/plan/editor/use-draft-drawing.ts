@@ -13,6 +13,7 @@ type UseDraftDrawingArgs = {
   tool: EditorTool;
   resolveWallStart: (point: Point) => Point;
   resolveWallEnd: (start: Point, point: Point) => Point;
+  resolveRoomVertex: (previous: Point | null, point: Point) => Point;
   onWallReady: (start: Point, end: Point) => void;
   onRoomReady: (vertices: Point[], name: string) => void;
 };
@@ -21,6 +22,7 @@ export function useDraftDrawing({
   tool,
   resolveWallStart,
   resolveWallEnd,
+  resolveRoomVertex,
   onWallReady,
   onRoomReady,
 }: UseDraftDrawingArgs) {
@@ -66,7 +68,13 @@ export function useDraftDrawing({
       closeRoomLoop(roomDraftVertices);
       return;
     }
-    setRoomDraftVertices((current) => [...current, point]);
+    const previous = roomDraftVertices.at(-1) ?? null;
+    const vertex = resolveRoomVertex(previous, point);
+    setRoomDraftVertices((current) => [...current, vertex]);
+  }
+
+  function updateRoomCursor(point: Point) {
+    setCursorPoint(resolveRoomVertex(roomDraftVertices.at(-1) ?? null, point));
   }
 
   function handlePointerDown(point: Point) {
@@ -101,6 +109,7 @@ export function useDraftDrawing({
     cursorPoint,
     setCursorPoint,
     updateWallCursor,
+    updateRoomCursor,
     resetDrafts,
     handlePointerDown,
     confirmRoomName,

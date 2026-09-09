@@ -24,6 +24,7 @@ Prowadzone na bieżąco.
 | 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/geometry/edit-geometry.ts`, `plan/editor/use-draft-drawing.ts`, `plan/editor/use-floor-plan-editor.ts` | Narzędzie „Dodaj ścianę” w toolbarze. Kąt nowej ściany przyciągnięty na sztywno do wielokrotności 45° (długość zachowana); punkt startowy przyciągnięty do granicy najbliższej istniejącej ściany/pokoju, a przy pustym rzucie wymuszony na (0, 0). |
 | 2026-09-09 | `plan/editor/use-floor-plan-editor.ts` | Naprawa: „Zapisz rzut” zostawał aktywny na stałe po pierwszej edycji, bo `isDirty` porównywał z dokumentem sprzed montowania komponentu, nie z ostatnio zapisaną wersją. |
 | 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/editor/use-floor-plan-editor.ts` | „Zapisz rzut” jako sama ikona; obok nowy przycisk „X” („Odrzuć zmiany”) — cofa cały niezapisany szkic do ostatnio zapisanej wersji i czyści historię cofania/ponawiania. |
+| 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/geometry/room-snap.ts` (nowy), `plan/editor/use-draft-drawing.ts`, `plan/editor/use-floor-plan-editor.ts` | Narzędzie „Dodaj pokój” w toolbarze. Każdy wierzchołek pokoju (poza pierwszym) musi leżeć na rogu istniejącej ściany — przyciąga do najbliższego, chyba że odcinek od poprzedniego wierzchołka jest już osiowo wyrównany (0/45/90/135°), wtedy wolno postawić punkt poza ścianą pod tym kątem. |
 
 ## Decyzje podjęte po drodze
 
@@ -45,8 +46,9 @@ Prowadzone na bieżąco.
 
 ## Świadomie pominięte
 
-- Narzędzie „Dodaj pokój” w toolbarze — BL-020 dalej otwarte, wraca w kolejnych
-  commitach na tej gałęzi.
+- BL-021 (walidacja serwerowa czworokąta ściany) i analogiczna walidacja pokoju —
+  edytor tworzy tylko poprawną geometrię z konstrukcji, ale API nadal nie sprawdza
+  tego niezależnie po stronie serwera.
 
 ## Wpływ na wdrożenie
 

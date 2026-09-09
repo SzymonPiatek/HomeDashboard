@@ -1,6 +1,6 @@
 "use client";
 
-import { MousePointer2, PenLine, Redo2, Save, Trash2, Undo2, X } from "lucide-react";
+import { MousePointer2, PenLine, Redo2, Save, Shapes, Trash2, Undo2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,10 @@ type EditorToolbarProps = {
   onDiscard: () => void;
 };
 
-// "Dodaj pokój" dołączy tu, gdy będzie gotowe.
 const TOOL_BUTTONS: { tool: EditorTool; label: string; icon: typeof MousePointer2 }[] = [
   { tool: "select", label: "Zaznacz", icon: MousePointer2 },
   { tool: "wall", label: "Dodaj ścianę", icon: PenLine },
+  { tool: "room", label: "Dodaj pokój", icon: Shapes },
 ];
 
 export function EditorToolbar({

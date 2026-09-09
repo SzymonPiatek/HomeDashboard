@@ -19,6 +19,7 @@ import {
   updateRoom,
   updateWall,
 } from "../geometry/edit-geometry";
+import { snapRoomVertex } from "../geometry/room-snap";
 import type { EditorSelection, EditorTool } from "./types";
 import { useDraftDrawing } from "./use-draft-drawing";
 import { useShapeDrag } from "./use-shape-drag";
@@ -65,6 +66,7 @@ export function useFloorPlanEditor(
     tool,
     resolveWallStart: (point) => snapWallStartToBoundary(point, draft),
     resolveWallEnd: snapWallAngle,
+    resolveRoomVertex: (previous, point) => snapRoomVertex(previous, point, draft),
     onWallReady: (start, end) => {
       const wall = createWall(start, end, DEFAULT_WALL_THICKNESS_MM);
       commitDraft((current) => addWall(current, wall));
@@ -94,7 +96,7 @@ export function useFloorPlanEditor(
     if (tool === "wall") {
       drawing.updateWallCursor(point);
     } else if (tool === "room") {
-      drawing.setCursorPoint(point);
+      drawing.updateRoomCursor(point);
     }
   }
 
