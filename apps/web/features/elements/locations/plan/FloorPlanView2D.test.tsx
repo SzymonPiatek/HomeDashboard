@@ -1,8 +1,18 @@
 import type { FloorPlanDocument } from "@repo/contracts/floor-plan";
-import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { FloorPlanView2D } from "./FloorPlanView2D";
+
+function renderView(document: FloorPlanDocument) {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <FloorPlanView2D locationId="loc-1" levelId="lvl-1" document={document} isEditMode={false} />
+    </QueryClientProvider>,
+  );
+}
 
 const DOCUMENT: FloorPlanDocument = {
   version: 1,
@@ -36,7 +46,7 @@ const EMPTY_DOCUMENT: FloorPlanDocument = { version: 0, walls: [], rooms: [] };
 
 describe("FloorPlanView2D", () => {
   it("renderuje ścianę jako element z dostępną nazwą, obsługiwalny klawiaturą", () => {
-    render(<FloorPlanView2D document={DOCUMENT} />);
+    renderView(DOCUMENT);
 
     const wall = screen.getByRole("button", { name: "Ściana 1, 4,00 m × 0,20 m" });
     expect(wall).toBeInTheDocument();
@@ -44,9 +54,10 @@ describe("FloorPlanView2D", () => {
   });
 
   it("renderuje pustą siatkę dla dokumentu bez zapisanej geometrii, nie błąd", () => {
-    render(<FloorPlanView2D document={EMPTY_DOCUMENT} />);
+    renderView(EMPTY_DOCUMENT);
 
-    expect(screen.getByLabelText("Rzut poziomu, widok z góry")).toBeInTheDocument();
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    const canvas = screen.getByLabelText("Rzut poziomu, widok z góry");
+    expect(canvas).toBeInTheDocument();
+    expect(within(canvas).queryByRole("button")).not.toBeInTheDocument();
   });
 });

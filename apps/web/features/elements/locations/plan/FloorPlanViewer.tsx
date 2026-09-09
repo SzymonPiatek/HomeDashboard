@@ -8,19 +8,31 @@ import { FloorPlanView3D, type WallVisibilityMode } from "./FloorPlanView3D";
 export type ViewMode = "2d" | "3d";
 
 type FloorPlanViewerProps = {
+  locationId: string;
+  levelId: string;
   document: FloorPlanDocument;
   mode: ViewMode;
   wallVisibilityMode: WallVisibilityMode;
+  isEditMode: boolean;
 };
 
-// Czysto prezentacyjny — dane pochodzą z hooka API w widoku strony poziomu
-// (.claude/rules/floor-plan.md). Sterowanie trybem widoku mieszka w nagłówku
-// strony (LevelPlanPageView, FloorPlanViewControls), nie tutaj.
-export function FloorPlanViewer({ document, mode, wallVisibilityMode }: FloorPlanViewerProps) {
+export function FloorPlanViewer({
+  locationId,
+  levelId,
+  document,
+  mode,
+  wallVisibilityMode,
+  isEditMode,
+}: FloorPlanViewerProps) {
   return (
     <div className="flex min-h-96 flex-1 flex-col">
       {mode === "2d" ? (
-        <FloorPlanView2D document={document} />
+        <FloorPlanView2D
+          locationId={locationId}
+          levelId={levelId}
+          document={document}
+          isEditMode={isEditMode}
+        />
       ) : (
         <FloorPlanView3D document={document} wallVisibilityMode={wallVisibilityMode} />
       )}

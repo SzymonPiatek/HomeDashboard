@@ -1,7 +1,8 @@
 "use client";
 
+import type { FloorPlanDocument, PutFloorPlanBody } from "@repo/contracts/floor-plan";
 import { floorPlanDocumentSchema } from "@repo/contracts/floor-plan";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { readErrorMessage } from "./http";
 import { locationKeys } from "./query-keys";
@@ -27,5 +28,34 @@ export function useFloorPlan(locationId: string, levelId: string) {
     queryKey: locationKeys.plan(locationId, levelId),
     queryFn: () => fetchFloorPlan(locationId, levelId),
     staleTime: PLAN_STALE_TIME_MS,
+  });
+}
+
+async function putFloorPlan(
+  locationId: string,
+  levelId: string,
+  input: PutFloorPlanBody,
+): Promise<FloorPlanDocument> {
+  const response = await fetch(`/api/locations/${locationId}/levels/${levelId}/plan`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readErrorMessage(response, "Nie udało się zapisać rzutu poziomu."));
+  }
+
+  return floorPlanDocumentSchema.parse(await response.json());
+}
+
+export function usePutFloorPlan(locationId: string, levelId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: PutFloorPlanBody) => putFloorPlan(locationId, levelId, input),
+    onSuccess: (savedDocument) => {
+      queryClient.setQueryData(locationKeys.plan(locationId, levelId), savedDocument);
+    },
   });
 }
