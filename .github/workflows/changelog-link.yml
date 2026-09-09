@@ -1,0 +1,75 @@
+name: Branch changelog
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  link:
+    name: Link branch changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: changelog
+        shell: bash
+        run: |
+          branch="${{ github.event.pull_request.head.ref }}"
+          file=".changelog/${branch}.md"
+          {
+            echo "file=${file}"
+            if [ -f "${file}" ]; then echo "exists=true"; else echo "exists=false"; fi
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/github-script@v9
+        env:
+          CHANGELOG_FILE: ${{ steps.changelog.outputs.file }}
+          CHANGELOG_EXISTS: ${{ steps.changelog.outputs.exists }}
+        with:
+          script: |
+            const START = "<!-- changelog-link:start -->";
+            const END = "<!-- changelog-link:end -->";
+
+            const pr = context.payload.pull_request;
+            const file = process.env.CHANGELOG_FILE;
+            const exists = process.env.CHANGELOG_EXISTS === "true";
+
+            const repo = pr.head.repo.full_name;
+            const ref = pr.head.ref;
+            const href =
+              `https://github.com/${repo}/blob/` +
+              ref.split("/").map(encodeURIComponent).join("/") + "/" +
+              file.split("/").map(encodeURIComponent).join("/");
+
+            const line = exists
+              ? `📄 [\`${file}\`](${href})`
+              : `⚠️ Brak pliku \`${file}\`. Każda gałąź prowadzi swój wykaz zmian — załóż go przy pierwszym commicie.`;
+
+            const block = `${START}\n\n${line}\n\n${END}`;
+            const section = `## Wykaz zmian\n\n${block}\n`;
+            const current = pr.body ?? "";
+            const body = current.includes(START) && current.includes(END)
+              ? current.replace(new RegExp(`${START}[\\s\\S]*?${END}`), block)
+              : current.trim() === ""
+                ? section
+                : `${current.trimEnd()}\n\n${section}`;
+
+            if (body !== current) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body,
+              });
+            }
+
+      - name: Branch changelog exists
+        if: steps.changelog.outputs.exists != 'true'
+        shell: bash
+        run: |
+          echo "::error::Brak ${{ steps.changelog.outputs.file }} — każda gałąź prowadzi swój wykaz zmian (.claude/rules/git.md)."
+          exit 1
