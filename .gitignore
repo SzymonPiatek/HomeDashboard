@@ -1,1 +1,14 @@
 .idea
+
+# Artefakty budowania monorepo pnpm/Turborepo (.claude/rules/stack.md)
+node_modules
+.turbo
+dist
+.next
+*.tsbuildinfo
+
+# Konfiguracja środowiskowa — realne wartości nie trafiają do repo,
+# jedynie *.env.example (.claude/rules/ops.md)
+envs/*.env
+!envs/*.env.example
+

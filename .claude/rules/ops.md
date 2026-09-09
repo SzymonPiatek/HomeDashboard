@@ -1,5 +1,20 @@
 # Reguły: Docker, CI, konfiguracja, wydania
 
+## Komentarze w plikach konfiguracyjnych
+
+Dotyczy `docker-compose*.yml`, `Dockerfile`, `envs/*.env.example`, workflow CI i
+każdego innego pliku konfiguracyjnego w tym obszarze — te pliki nie są TypeScriptem,
+ale reguła komentarzy z `.claude/rules/typescript.md` obowiązuje tu tak samo.
+
+Komentarz tłumaczy **dlaczego**, nigdy **co** — nazwa zmiennej i wartość już mówią,
+co się dzieje. **Limit: 1–2 linie.** Dłuższy wywód (uzasadnienie decyzji, opis pułapki,
+historia) należy do `.claude/rules/ops.md` albo `envs/README.md` — w komentarzu zostaje
+najwyżej jedno zdanie i odesłanie do właściwego miejsca, nie powtórzenie treści.
+Powtórzona treść to dwa miejsca do aktualizacji, które przy pierwszej zmianie się rozjadą.
+
+Zła: przepisanie całego akapitu z `.claude/rules/dev.md` o porcie 5433 nad zmienną
+`DB_HOST_PORT`. Dobra: `# 5433, nie 5432 — patrz .claude/rules/dev.md`.
+
 ## Zmienne środowiskowe
 
 Konfiguracja żyje w katalogu **`envs/` w korzeniu repozytorium**, jeden plik na serwis:

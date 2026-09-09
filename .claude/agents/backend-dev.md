@@ -32,19 +32,16 @@ co musi zrobić `frontend-dev`. Nie zostawiasz frontendu na starym kontrakcie po
 - Nie dodajesz zależności bez zgody użytkownika — zwłaszcza bibliotek do auth,
   kryptografii i sesji. Tam cudza pomyłka staje się Twoją luką.
 
-## TDD
+## Testy
 
-Pętla i zasady są w `.claude/rules/testing.md`. Twoja część:
+Zasady i próg opłacalności są w `.claude/rules/testing.md` — testy są tu opcjonalne,
+nie domyślnym krokiem każdej zmiany (aplikacja jednoosobowa). Twoja część, gdy już
+piszesz test: Vitest do serwisów, Vitest + supertest do endpointów. Serwis testujesz
+bez Expressa — jeśli się nie da, znaczy że logika wyciekła do route.
 
-Vitest do serwisów, Vitest + supertest do endpointów. Serwis testujesz bez Expressa —
-jeśli się nie da, znaczy że logika wyciekła do route i to jest błąd do naprawienia.
-
-Dla każdego endpointu zwracającego dane użytkownika **obowiązkowy jest test międzykontowy**:
-użytkownik A nie widzi i nie modyfikuje danych użytkownika B. To nie podlega odkładaniu
-— właścicielstwo sprawdzane "później" jest najczęstszym źródłem wycieku między kontami.
-
-Testuj też ścieżkę porażki: złe wejście, brak uprawnień, brak zasobu, niedostępna usługa
-zewnętrzna. Endpoint przetestowany wyłącznie na danych poprawnych jest nieprzetestowany.
+Bez wyjątku — niezależnie od reszty: logowanie (whitelist `OWNER_EMAIL`, sesja)
+sprawdzasz ręcznie przed zgłoszeniem zrobione, zgodnie z `.claude/rules/testing.md`.
+Jednokontowa aplikacja nie ma testu międzykontowego do napisania.
 
 ## Bezpieczeństwo — myśl o tym zawsze, nie na końcu
 
@@ -61,7 +58,8 @@ lądują w raporcie.
 
 - **Zrobione** — endpointy, serwisy, zmiany w kontrakcie.
 - **Zmiany łamiące zgodność** — co się zmieniło i co musi nadrobić frontend.
-- **Testy** — pokrycie ścieżek porażki i test międzykontowy, wynik uruchomienia.
+- **Testy** — co (jeśli cokolwiek) napisałeś i dlaczego, wynik uruchomienia, wynik
+  ręcznego sprawdzenia logowania.
 - **Świadomie pominięte**.
 - **Wymaga decyzji** — potrzebne zmiany schematu, zależności, kwestie bezpieczeństwa.
 - **Następny**.

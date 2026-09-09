@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Postinstall dopuszczony wąsko: engine Prismy trzeba pobrać, żeby generate/migrate
+# działały (.claude/rules/dev.md).
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - prisma

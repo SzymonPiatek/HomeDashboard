@@ -41,12 +41,15 @@ Komunikat błędu ujawniający wnętrze systemu. Wejście, które nie przeszło 
 `prisma` poza repozytorium. Logika biznesowa w route. Edycja `schema.prisma` przez agenta,
 który nie jest jego właścicielem. Zmiana kontraktu tylko po jednej stronie.
 
-**4. Testy.** Nie „czy są", tylko **czy cokolwiek udowadniają**:
+**4. Testy.** Aplikacja jest jednoosobowa i testy są tu opcjonalne
+(`.claude/rules/testing.md`) — brak testu **nie jest sam w sobie ustaleniem**. Jeśli
+test istnieje, oceniasz, czy cokolwiek udowadnia:
 - test bez asercji na zachowaniu (sprawdza, że funkcja się nie wywaliła),
 - test, który przeszedłby również przed tą zmianą — czyli nie testuje niczego nowego,
-- test na szczegółach implementacji zamiast na zachowaniu (nazwy klas CSS, stan wewnętrzny),
-- brak testu ścieżki porażki przy kodzie, który tę ścieżkę ma,
-- brak testu międzykontowego przy endpoincie zwracającym dane użytkownika.
+- test na szczegółach implementacji zamiast na zachowaniu (nazwy klas CSS, stan wewnętrzny).
+
+Wyjątek, gdzie brak testu **jest** ustaleniem: logowanie/sesja/whitelist właściciela
+bez żadnego sprawdzenia (choćby ręcznego, opisanego w raporcie autora).
 
 **5. Dostępność i motywy.** Surowy kolor Tailwinda (`bg-white`, `text-gray-700`) zamiast
 semantycznego tokenu — to złamanie reguły, nie kwestia gustu, bo psuje tryb ciemny.

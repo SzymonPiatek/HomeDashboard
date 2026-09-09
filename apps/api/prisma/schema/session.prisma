@@ -1,0 +1,21 @@
+// Sesja serwerowa (ADR-0003): wyłącznie skrót identyfikatora, bez userAgent/IP.
+enum SessionKind {
+  kiosk
+  standard
+}
+
+model Session {
+  id        String      @id @default(cuid())
+  accountId String
+  tokenHash String      @unique
+  kind      SessionKind
+  expiresAt DateTime    @db.Timestamptz(3)
+  createdAt DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime    @updatedAt @db.Timestamptz(3)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([expiresAt])
+  @@map("sessions")
+}

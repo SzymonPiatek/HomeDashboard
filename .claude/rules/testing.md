@@ -1,32 +1,36 @@
 # Reguły: testy
 
-Obowiązują każdego, kto pisze kod — nie tylko `qa-engineer`.
+To prywatna aplikacja jednoosobowa — jeden użytkownik (właściciel), bez zewnętrznych
+odbiorców, bez SLA. Rygor testowy typowy dla zespołu i produktu komercyjnego tu nie
+obowiązuje: **testy są opcjonalne, nie domyślnym krokiem każdej zmiany.** Pisanie testu
+do wszystkiego spowalnia tworzenie bez proporcjonalnej korzyści przy tej skali.
 
-## TDD
+## Kiedy pisać test
 
-Test przed implementacją, zawsze. Kolejność jest odwrotna do naturalnej i to jest cel:
+Pisz test, gdy się to realnie opłaca:
+- logika jest nieoczywista i łatwo ją niechcący zepsuć przy okazji innej zmiany,
+- błąd byłby kosztowny albo trudny do wykrycia ręcznie — w szczególności **logowanie,
+  sesja, whitelist właściciela** (`.claude/rules/api.md`) i cokolwiek dotyka bazy danych
+  w sposób trudny do cofnięcia,
+- coś już się na tym wywróciło raz — test regresji zapobiega drugiemu razowi.
 
-1. Test opisujący oczekiwane zachowanie → **uruchom i zobacz go czerwonym**.
-   Test, którego nie widziałeś czerwonego, niczego nie dowodzi.
-2. Najprostszy kod, który go zazieleni.
-3. Sprzątanie na zielonym.
+W pozostałych przypadkach (prosty widok, oczywisty CRUD, jednorazowy skrypt) — bez
+testu. TDD (test przed kodem) nie jest wymagany; pisz kod, testem opatrz to, co
+faktycznie tego wymaga, jeśli w ogóle.
 
-Jedyne odstępstwo: zmiana czysto wizualna, nie wprowadzająca żadnego zachowania
-(kolor, odstęp, układ). Odnotowuje się je jawnie w raporcie. Nigdy nie klasyfikuj tak
-zmiany, która dodaje warunek, stan albo obsługę zdarzenia.
+Zawsze wymagane, niezależnie od powyższego: **ręczne sprawdzenie ścieżki logowania**
+przed zgłoszeniem zrobione — konto z białej listy loguje się, konto spoza niej nie.
+Nie musi być zautomatyzowane, musi być zobaczone na własne oczy.
 
-## Poziomy
+## Jeśli jednak piszesz test
 
-| Poziom | Narzędzie | Co pokrywa |
+| Poziom | Narzędzie | Kiedy sięgnąć |
 |---|---|---|
 | Jednostkowe | Vitest | logika domenowa, funkcje czyste, hooki |
-| Integracyjne | Vitest + supertest / prawdziwa baza w Dockerze | endpointy, repozytoria |
-| E2E | Playwright | ścieżki użytkownika przez wiele ekranów i warstw |
+| Integracyjne | Vitest + supertest / prawdziwa baza w Dockerze | endpointy i repozytoria dotykające bazy |
+| E2E | Playwright | ścieżka logowania i inne rzeczy, których naprawdę szkoda by było zepsuć bez ostrzeżenia |
 
-E2E jest najdroższy i najwolniejszy — pokrywa **ścieżki krytyczne**, nie każdy przycisk.
-Zachowanie dające się sprawdzić niżej sprawdzasz niżej.
-
-## Selektory w testach UI
+### Selektory w testach UI
 
 **Podstawa: rola + dostępna nazwa.**
 
@@ -36,63 +40,28 @@ page.getByLabel('E-mail')
 page.getByRole('heading', { name: 'Ustawienia' })
 ```
 
-Test szuka wtedy tego samego, co czytnik ekranu. Jeśli test nie znajduje elementu po
-nazwie, element jest też niedostępny dla technologii asystujących — i to jest błąd
-do naprawienia w komponencie, **nie powód do dołożenia selektora**.
+Jeśli test nie znajduje elementu po nazwie, element jest też niedostępny dla technologii
+asystujących — błąd do naprawienia w komponencie (WCAG 2.2 AA nadal obowiązuje jako wymóg
+produktu, `.claude/rules/web.md` — to osobna sprawa od tego, ile testów piszesz), nie
+powód do dołożenia selektora.
 
-Z tego wynika obowiązek dla `frontend-dev`: **każdy element interaktywny ma dostępną
-nazwę.** Przycisk ma tekst albo `aria-label`. Pole ma powiązany `label`. Ikona bez tekstu
-ma `aria-label` opisujący czynność, nie wygląd („Usuń zadanie", nie „Kosz").
+`data-testid` tylko tam, gdzie nazwa nie wystarcza (element listy, sekcja strony) —
+kebab-case, `data-testid="obszar-element"`. Zakazane: klasy CSS, nazwy tagów, `nth-child`,
+XPath po strukturze.
 
-**`data-testid` wyłącznie tam, gdzie nazwa nie wystarcza:**
-- wskazanie konkretnego elementu listy (`data-testid="task-row"` + zawężenie po treści),
-- zawężenie do sekcji lub regionu strony,
-- element bez sensownej nazwy dostępnej, którego nie da się inaczej odróżnić.
+### Co test ma udowadniać, jeśli już istnieje
 
-Format: `data-testid="obszar-element"`, kebab-case. Nie dokładaj `testid` do elementu,
-który da się znaleźć po roli i nazwie.
+- Testuje **zachowanie widoczne dla użytkownika lub wywołującego**, nie stan wewnętrzny
+  ani szczegóły implementacji.
+- Test bez asercji na zachowaniu jest bezwartościowy. Test, który przeszedłby też przed
+  Twoją zmianą, niczego nie dowodzi.
+- Nazwa opisuje zachowanie i warunek: „odrzuca logowanie spoza białej listy", nie „test 3".
 
-**Zakazane selektory:** klasy CSS, nazwy tagów, `nth-child`, XPath po strukturze.
-Wiążą test z wyglądem zamiast z zachowaniem i pękają przy każdej zmianie układu.
+### Niezawodność
 
-## Co test ma udowadniać
+- Zakaz `waitForTimeout`/`sleep` — czekasz na warunek, nie na upływ czasu.
+- Zakaz zależności między testami; każdy przygotowuje sobie stan sam.
+- Czas i losowość zamrożone tam, gdzie wpływają na wynik. Zewnętrzne API zaślepione.
 
-- Testujesz **zachowanie widoczne dla użytkownika lub wywołującego**, nie stan wewnętrzny,
-  nazwy klas ani szczegóły implementacji.
-- Test bez asercji na zachowaniu (sprawdzający tylko, że nic nie rzuciło) jest bezwartościowy.
-- Test, który przeszedłby również przed Twoją zmianą, nie testuje Twojej zmiany.
-- Nazwa testu opisuje zachowanie i warunek: „odrzuca rejestrację przy zajętym e-mailu",
-  nie „test 3".
-- Każdy kod mający ścieżkę porażki ma test tej ścieżki. Endpoint przetestowany wyłącznie
-  na danych poprawnych jest nieprzetestowany.
-- Każdy endpoint zwracający dane użytkownika ma **test międzykontowy**: A nie widzi
-  i nie modyfikuje danych B.
-
-## Dostępność i motywy w testach
-
-- Ścieżki krytyczne przechodzą **automatyczne sprawdzenie dostępności** (axe) — wykrywa
-  brakujące nazwy, złe role i zbyt niski kontrast. Naruszenie jest błędem, nie ostrzeżeniem.
-- Automat wyłapuje część problemów, nie wszystkie. Kolejność fokusu, sensowność nazw
-  i pułapki fokusu w dialogach sprawdza się ręcznie.
-- **Ścieżki krytyczne przechodzą w obu motywach.** Nie duplikuj wszystkich testów — wystarczy
-  parametryzacja motywu dla scenariuszy, w których kolor niesie znaczenie (statusy, błędy,
-  wykresy).
-- Test przełączania motywu sprawdza też trwałość wyboru po przeładowaniu i brak mignięcia
-  złym motywem przy pierwszym malowaniu.
-
-## Niezawodność
-
-- **Zakaz `waitForTimeout`, `sleep` i sztywnych opóźnień.** Czekasz na warunek
-  (widoczność, treść, odpowiedź), nie na upływ czasu.
-- **Zakaz zależności między testami.** Każdy test przygotowuje sobie stan i da się go
-  uruchomić samotnie oraz w dowolnej kolejności.
-- **Każdy test e2e tworzy własnego użytkownika i własne dane.** Nigdy nie współdzieli konta
-  z innym testem — to główne źródło pękania przy równoległym uruchamianiu.
-- Czas i losowość są zamrożone tam, gdzie wpływają na wynik.
-- Zewnętrzne API jest zaślepione. Wyjątkiem jest jeden świadomy test kontraktu, jeśli w ogóle.
-
-## Test niestabilny to test zepsuty
-
-Test, który raz przechodzi, a raz nie, jest gorszy niż jego brak — uczy ignorowania
-czerwonego CI. Nie „przepuszcza się" go ponownym uruchomieniem i nie owija w retry.
-Albo naprawiasz przyczynę, albo wyłączasz test jawnie, z komentarzem i zgłoszeniem.
+Test niestabilny (raz przechodzi, raz nie) jest gorszy niż jego brak — albo naprawiasz
+przyczynę, albo go usuwasz. Nie owija się w retry.

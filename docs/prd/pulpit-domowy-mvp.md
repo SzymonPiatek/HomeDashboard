@@ -25,7 +25,7 @@ kontami — nie zgłoszono jej.
 
 1. Właściciel otwiera pulpit — na tablecie w mieszkaniu albo zdalnie w przeglądarce,
    zawsze pod tą samą domeną.
-2. Loguje się hasłem, a następnie kodem wysłanym na e-mail (2FA).
+2. Loguje się kontem Google.
 3. Widzi pulpit z kafelkami elementów; jednym z nich jest "Rzut mieszkania".
 4. Wchodzi na stronę elementu i widzi siatkę 2D — pustą przy pierwszym użyciu.
 5. Rysuje segmenty ścian odpowiadające układowi mieszkania.
@@ -38,7 +38,7 @@ kontami — nie zgłoszono jej.
 
 | ID | Historyjka | Kryteria akceptacji | MVP |
 |----|-----------|---------------------|-----|
-| US-1 | Jako właściciel chcę zalogować się hasłem i jednorazowym kodem e-mail (2FA), żeby dostęp do pulpitu — dostępnego pod publiczną domeną zarówno lokalnie, jak i zdalnie — był zabezpieczony mimo braku trybu offline. | 1. Zalogowanie wymaga poprawnego hasła **i** poprawnego, nieprzeterminowanego kodu z e-maila.<br>2. Błędne hasło i błędny/wygasły kod kończą się tą samą odpowiedzią, bez ujawnienia, który czynnik zawiódł.<br>3. Kod jest jednorazowy i ma ograniczony czas ważności. | tak |
+| US-1 | Jako właściciel chcę zalogować się kontem Google, żeby dostęp do pulpitu — dostępnego pod publiczną domeną zarówno lokalnie, jak i zdalnie — był zabezpieczony bez budowania własnej infrastruktury haseł, mimo braku trybu offline. | 1. Logowanie to przekierowanie do Google i powrót z autoryzacją (OAuth), bez własnego formularza hasła.<br>2. Logowanie kończy się sukcesem wyłącznie dla konta Google z adresem e-mail na białej liście właściciela; każde inne konto Google dostaje odmowę, bez ujawniania czy próbowano się zalogować na istniejące konto.<br>3. Sesja po zalogowaniu żyje w ciasteczku HttpOnly. | tak |
 | US-2 | Jako właściciel chcę mieć na pulpicie element "Rzut mieszkania" z własną stroną, żeby mieć jedno miejsce z wizualnym stanem mieszkania. | 1. Element jest widoczny w nawigacji i ma dedykowaną stronę.<br>2. Przy braku zapisanego rzutu strona pokazuje pustą siatkę, nie błąd. | tak |
 | US-3 | Jako właściciel chcę ręcznie narysować ściany mieszkania na siatce 2D, żeby rzut odzwierciedlał rzeczywisty układ pomieszczeń. | 1. Mogę dodać, przesunąć i usunąć segment ściany.<br>2. Układ ścian jest zapisany i widoczny po ponownym wejściu na stronę. | tak |
 | US-4 | Jako właściciel chcę przeciągać na rzut ikony mebli i urządzeń (z zamkniętej listy typów) i zapisywać ich pozycję, żeby widzieć, co faktycznie stoi gdzie w mieszkaniu. | 1. Mogę umieścić obiekt wybranego typu przez przeciągnięcie na siatkę.<br>2. Mogę przesunąć i usunąć umieszczony obiekt.<br>3. Pozycje są zapisane i widoczne po ponownym wejściu na stronę. | tak |
@@ -52,8 +52,8 @@ aktualny obraz mieszkania dostępny z dowolnego miejsca, bez zależności od spr
 ## 5. Zakres
 
 **W zakresie:**
-- Logowanie hasłem + 2FA kodem e-mail, wysyłanym przez istniejącą infrastrukturę
-  pocztową użytkownika na VPS.
+- Logowanie kontem Google (OAuth), ograniczone białą listą do adresu e-mail
+  właściciela — bez hasła i bez 2FA e-mail.
 - Jeden element pulpitu: "Rzut mieszkania", z własną stroną w rejestrze elementów.
 - Ręczne rysowanie i edycja ścian mieszkania w 2D na siatce.
 - Ręczne dodawanie, przesuwanie i usuwanie ikon mebli/urządzeń z zamkniętej listy
@@ -89,7 +89,7 @@ aktualny obraz mieszkania dostępny z dowolnego miejsca, bez zależności od spr
 |---|---|---|
 | Wydajność | Strona rzutu mieszkania (do ok. 50 obiektów) staje się interaktywna w ≤2 s na tablecie w sieci domowej | pomiar czasu do interaktywności na docelowym tablecie |
 | Dostępność (a11y) | WCAG 2.2 AA na pulpicie i stronie elementu; umieszczanie i przesuwanie obiektu ma pełny odpowiednik klawiaturowy, nie tylko przeciąganie myszą/palcem | automatyczne sprawdzenie axe na ścieżkach krytycznych + ręczna weryfikacja fokusu i obsługi klawiaturą |
-| Bezpieczeństwo | Logowanie wymaga hasła i kodu 2FA e-mail; sesja w ciasteczku HttpOnly zgodnie z `.claude/rules/api.md` | test integracyjny logowania z poprawnym i niepoprawnym kodem 2FA |
+| Bezpieczeństwo | Logowanie wyłącznie kontem Google z białej listy; sesja w ciasteczku HttpOnly zgodnie z `.claude/rules/api.md` | test integracyjny logowania z adresem na białej liście i spoza niej |
 | Urządzenia / przeglądarki | Tablet dotykowy w trybie kiosk oraz desktop (mysz/klawiatura), najnowsze wersje Chrome/Safari | ręczny test na docelowym tablecie + Playwright w co najmniej jednej przeglądarce |
 | Skala | 1–5 elementów pulpitu, jedno mieszkanie, jeden użytkownik, do ok. 50 obiektów na rzucie | brak testu obciążeniowego na tym etapie — założenie odnotowane, nie zmierzone |
 
@@ -99,9 +99,9 @@ aktualny obraz mieszkania dostępny z dowolnego miejsca, bez zależności od spr
   monorepo pnpm + Turborepo) — nie jest przedmiotem tego PRD.
 - Jedna domena przez reverse proxy (`.claude/rules/stack.md`, `.claude/rules/ops.md`)
   — brak trybu offline, tablet zawsze łączy się przez sieć, tak jak dostęp zdalny.
-- Kod 2FA jest wysyłany przez istniejącą infrastrukturę pocztową użytkownika na
-  jego własnym VPS — konfiguracja tej integracji (SMTP, konto) jest poza tym PRD,
-  ale jest twardym wymogiem, nie propozycją do wyboru.
+- Logowanie zależy od dostępności Google jako dostawcy OAuth — poświadczenia
+  aplikacji (Client ID/Secret) zakłada i dostarcza właściciel, konfiguracja poza
+  tym PRD.
 - Raspberry Pi z Home Assistant **nie istnieje fizycznie dzisiaj** — to kierunek
   docelowy integracji IoT, nie stan obecny. Nie planować sprintu integracyjnego
   (US-6, BL-002) przed potwierdzeniem, że sprzęt działa.
@@ -114,7 +114,7 @@ aktualny obraz mieszkania dostępny z dowolnego miejsca, bez zależności od spr
 |---|---|---|
 | Brak fizycznego Raspberry Pi/Home Assistant | Element "Rzut mieszkania" pokazuje tylko statyczne ikony bez realnego stanu urządzeń; US-6/BL-002 nie mogą ruszyć | Próba zaplanowania integracji HA w sprincie bez potwierdzenia, że sprzęt działa i jest w sieci |
 | Przeciąganie obiektów na dotyku tabletu bywa niedokładne (przypadkowe przesunięcia, brak precyzji palcem) | Frustrujący, niedokładny rzut na urządzeniu, które jest głównym miejscem korzystania | Trudności z precyzyjnym umieszczeniem obiektu zgłoszone lub zaobserwowane podczas testów na tablecie |
-| 2FA e-mail zależy od infrastruktury pocztowej na zewnętrznym VPS użytkownika | Logowanie niedostępne, gdy VPS/poczta padnie — właściciel odcięty od własnego pulpitu | Kod e-mail nie dociera w rozsądnym czasie podczas testu logowania |
+| Logowanie zależy wyłącznie od Google jako dostawcy OAuth | Awaria/niedostępność Google albo utrata dostępu do konta Google odcina właściciela od własnego pulpitu, bez metody zapasowej | Niedostępność logowania podczas testu, brak jakiejkolwiek alternatywnej ścieżki wejścia |
 | Ręczne rysowanie ścian i mebli bez importu/detekcji jest pracochłonne przy każdej zmianie układu mieszkania | Rzut przestaje być aktualizowany, dane w elemencie stają się nieaktualne | Rzut nie był edytowany mimo zgłoszonej zmiany w mieszkaniu |
 | Jednokontowy model bez ról może okazać się za wąski, gdy ktoś inny zechce mieć dostęp | Przebudowa modelu tożsamości później (migracja danych, zmiana auth) | Prośba o dodanie drugiego konta/dostępu |
 
@@ -122,20 +122,25 @@ aktualny obraz mieszkania dostępny z dowolnego miejsca, bez zależności od spr
 
 Rozstrzygnięte z użytkownikiem 2026-09-09:
 
-- [x] **2FA e-mail wchodzi do MVP** (US-1) — potwierdzone, rekomendacja przyjęta bez
-      zmian.
+- [x] **2FA e-mail wchodzi do MVP** (US-1) — potwierdzone pierwotnie, następnie
+      **zastąpione logowaniem Google** tego samego dnia (patrz niżej). Hasło+2FA
+      e-mail jako metoda zapasowa przeniesione do
+      [BL-008](../backlog.md#bl-008--logowanie-hasłem--2fa-e-mail-jako-metoda-zapasowa).
+- [x] **Logowanie Google zastępuje całkowicie hasło+2FA e-mail w MVP** — właściciel
+      uznał to za prostsze: Google zapewnia silne uwierzytelnienie bez budowania
+      własnej infrastruktury haseł i wysyłki e-mail. Model tożsamości z dwoma
+      źródłami (hasło i `googleSub`) opisany w `.claude/rules/api.md` pozostaje
+      architektonicznie otwarty na dodanie hasła później — MVP używa tylko ścieżki
+      Google.
 - [x] **Lista typów ikon mebli/urządzeń** — mała lista startowa, projektuje ją
       `ux-designer` jako część specyfikacji elementu "Rzut mieszkania"; rozszerzanie
       listy o nowe typy to osobne zadanie później, nie edytor ikon w UI od startu.
 - [x] **Sesja na tablecie kiosk jest długożyjąca** — tygodnie/miesiące bez wymuszonego
-      ponownego logowania (hasło+2FA); wylogowanie tylko ręczne albo przy zmianie
-      hasła. Sesja zdalna (spoza mieszkania) trzyma standardową politykę wygasania.
-      Wpływa na projekt auth w `backend-dev`.
+      ponownego logowania; wylogowanie tylko ręczne albo przy odebraniu dostępu
+      (usunięcie z białej listy). Sesja zdalna (spoza mieszkania) trzyma standardową
+      politykę wygasania. Wpływa na projekt auth w `backend-dev`.
 
 Wciąż otwarte, nie blokują PRD:
 
-- [ ] Konfiguracja wysyłki e-mail z kodem 2FA przez istniejącą infrastrukturę
-      pocztową VPS (SMTP, konto, zmienne środowiskowe) — do ustalenia z
-      `backend-dev`/`data-engineer`, poza zakresem tego PRD.
 - [ ] Jednostka/skala siatki rzutu (np. metry vs. jednostka umowna) — szczegół
       techniczny dla `web-architect`, nie blokuje PRD.

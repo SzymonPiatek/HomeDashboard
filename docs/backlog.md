@@ -40,6 +40,12 @@ Wpisy sortowane rosnąco po numerze. Numer nie oznacza priorytetu ani kolejnośc
 - **Koszt zaniechania:** rzut mieszkania pozostaje statyczną ikonografią bez
   prawdziwego stanu urządzeń; właściciel nadal sprawdza Mi Home i SmartThings
   osobno. Nie planować sprintu wcześniej, niż sprzęt fizycznie zacznie działać.
+- **Do rozstrzygnięcia razem z tym wpisem (jeszcze nierozwiązane):** `apps/api`
+  docelowo działa na VPS właściciela, Home Assistant będzie stał na Raspberry Pi
+  za NAT-em domowego routera bez otwartych portów publicznych — potrzebny tunel
+  inicjowany od strony Raspberry Pi (np. WireGuard/Tailscale) między VPS a
+  mieszkaniem, nie odwrotnie. Rozstrzyga `release-engineer` razem z
+  `web-architect`, dopiero gdy sprzęt fizycznie stanie.
 - **Status:** zablokowane (Raspberry Pi z Home Assistant jeszcze nie istnieje fizycznie)
 
 ### BL-003 — Automatyzacje/reguły sterujące urządzeniami
@@ -87,3 +93,24 @@ Wpisy sortowane rosnąco po numerze. Numer nie oznacza priorytetu ani kolejnośc
 - **Koszt zaniechania:** pulpit pokrywa tylko dwa dzisiejsze urządzenia; każde
   kolejne wymaga osobnej integracji przez Home Assistant.
 - **Status:** zablokowane (zależy od BL-002)
+
+### BL-008 — Logowanie hasłem + 2FA e-mail jako metoda zapasowa
+
+- **Źródło:** [docs/prd/pulpit-domowy-mvp.md](prd/pulpit-domowy-mvp.md), sekcja 9
+- **Co odkładamy:** drugą ścieżkę logowania (hasło + jednorazowy kod e-mail) obok
+  Google, na wypadek utraty dostępu do konta Google. Model tożsamości z dwoma
+  źródłami (hasło i `googleSub`) jest już przewidziany w `.claude/rules/api.md`.
+- **Koszt zaniechania:** utrata dostępu do konta Google właściciela odcina go od
+  własnego pulpitu bez żadnej alternatywy logowania.
+- **Status:** otwarte
+
+### BL-009 — Sprzątanie wygasłych sesji
+
+- **Źródło:** [docs/adr/0003-server-session-with-two-lifetimes.md](adr/0003-server-session-with-two-lifetimes.md),
+  sekcja "Otwarte kwestie"
+- **Co odkładamy:** cykliczne usuwanie z bazy wierszy `Session` z `expiresAt` w
+  przeszłości. `requireSession` i tak filtruje po `expiresAt`, więc to nie jest luka
+  bezpieczeństwa — tylko rosnąca tabela.
+- **Koszt zaniechania:** tabela sesji rośnie bez ograniczenia; do rozstrzygnięcia razem
+  z pierwszym zadaniem cyklicznym w `apps/api`.
+- **Status:** otwarte

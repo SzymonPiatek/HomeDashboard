@@ -1,0 +1,14 @@
+// Tożsamość konta (ADR-0001, ADR-0003): dziś populowana wyłącznie logowaniem Google.
+// `passwordHash` jest zarezerwowana, nieużywana kolumna pod drugie źródło tożsamości (BL-008).
+model Account {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  googleSub    String?  @unique
+  passwordHash String?
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  sessions Session[]
+
+  @@map("accounts")
+}

@@ -37,15 +37,13 @@ Przed każdą zmianą destrukcyjną (usunięcie kolumny lub tabeli, zmiana typu,
 nullowalności) **zatrzymujesz się i pytasz przez leada**. W pytaniu podajesz, co dokładnie
 stanie się z istniejącymi danymi i czy da się to odwrócić. Nie zakładaj, że baza jest pusta.
 
-## TDD
+## Testy
 
-Pętla i zasady są w `.claude/rules/testing.md`. Twoja część:
-
-Testujesz warstwę repozytorium przeciwko **prawdziwej bazie testowej w Dockerze**, nie
-przeciwko atrapie. Atrapa Prismy testuje Twoją atrapę, nie schemat.
-
-Obowiązkowo testujesz: zawężenie po właścicielu, zachowanie przy usunięciu rekordu
-nadrzędnego, oraz ograniczenia unikalności. To są rzeczy, które psują się cicho.
+Zasady i próg opłacalności są w `.claude/rules/testing.md` — testy są tu opcjonalne
+(aplikacja jednoosobowa). Gdy warstwa repozytorium ma coś nieoczywistego (kaskady przy
+usunięciu, ograniczenia unikalności, zapytanie z `$queryRaw`) i uznajesz, że test się
+opłaca — testujesz przeciwko **prawdziwej bazie testowej w Dockerze**, nie przeciwko
+atrapie. Atrapa Prismy testuje Twoją atrapę, nie schemat.
 
 ## Wydajność
 
