@@ -9,12 +9,12 @@ Obowiązuje też `.claude/rules/typescript.md`.
 - Zakaz katalogu `app/api/**` i jakichkolwiek route handlerów.
 - Zakaz importu `@prisma/client` i jakiegokolwiek dostępu do bazy.
 - Zakaz Server Actions jako drogi do danych.
-**Jeden dozwolony wyjątek:** `rewrites` w `next.config.ts`, kierujące `/api/*` do API
-w środowisku deweloperskim. To konfiguracja sieciowa, nie logika — Next niczego nie
-przetwarza, a przeglądarka widzi jeden origin, dzięki czemu ciasteczka HttpOnly zachowują
-się jak na produkcji. Na produkcji zmienna z adresem jest pusta i ruch rozdziela reverse
-proxy. Rewrites **nie wolno** używać do agregowania danych, dokładania nagłówków
-uwierzytelniających ani żadnego innego przetwarzania.
+  **Jeden dozwolony wyjątek:** `rewrites` w `next.config.ts`, kierujące `/api/*` do API
+  w środowisku deweloperskim. To konfiguracja sieciowa, nie logika — Next niczego nie
+  przetwarza, a przeglądarka widzi jeden origin, dzięki czemu ciasteczka HttpOnly zachowują
+  się jak na produkcji. Na produkcji zmienna z adresem jest pusta i ruch rozdziela reverse
+  proxy. Rewrites **nie wolno** używać do agregowania danych, dokładania nagłówków
+  uwierzytelniających ani żadnego innego przetwarzania.
 
 - Zakaz sekretów w tym pakiecie. Zmienna `NEXT_PUBLIC_*` z definicji jest publiczna —
   nie wkładaj do niej niczego, czego nie chcesz zobaczyć w przeglądarce.
@@ -73,6 +73,10 @@ zobaczy niczego.
 - Zanim napiszesz nowy prymityw, sprawdź, czy shadcn/ui już go ma. Nie duplikuj przycisku.
 - Warunkowe klasy przez `cn()`. Zakaz `style={{...}}` i zakaz wartości arbitralnych
   Tailwinda (`w-[137px]`) bez komentarza z powodem.
+- `className` dłuższy niż jedna czytelna linijka wołaj przez `cn()` z kilkoma argumentami
+  — string na grupę (układ, wygląd, `hover:`, `focus-visible:`), nie jeden ciąg wszystkich
+  klas. `cva` dopiero gdy komponent ma warianty (`variant`, `size`) do przełączania —
+  bez wariantów to niepotrzebna maszyneria.
 
 ### Element pulpitu (ADR-0002, ADR-0007, ADR-0019, ADR-0020)
 
