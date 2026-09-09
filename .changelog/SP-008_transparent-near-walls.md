@@ -13,13 +13,20 @@ więc wnętrze jest widoczne bez ręcznego obracania.
 
 ## Co się zmieniło
 
-Prowadzone na bieżąco.
-
 | Data | Obszar | Zmiana |
 | ---- | ------ | ------ |
-|      |        |        |
+| 2026-09-09 | `plan/three/scene.ts` | Dla każdej ściany liczony jest środek i normalna skierowana na zewnątrz najbliższego pokoju; `updateNearCameraWallVisibility` co klatkę chowa ścianę, gdy kamera stoi po jej zewnętrznej stronie. |
+| 2026-09-09 | `plan/FloorPlanView3D.tsx`, `plan/FloorPlanViewer.tsx` | Przycisk trójstanowy (wszystkie widoczne / bliskie ukryte / wszystkie ukryte) w jednym rzędzie z przełącznikiem widoku 2D/3D, widoczny tylko w widoku 3D. |
 
 ## Decyzje podjęte po drodze
+
+- `Wall` nie ma odniesienia do `Room` (ADR-0010), więc zamiast modelu blueprint3d
+  (dwie krawędzie na ścianę, po jednej na sąsiadujący pokój) normalna ściany jest
+  liczona względem środka ciężkości **najbliższego** pokoju — uproszczenie świadome,
+  wystarczające przy jednym poziomie na dokument.
+- Domyślny tryb to „bliskie ukryte" (dotychczasowe automatyczne zachowanie); użytkownik
+  może włączyć „wszystkie widoczne" albo „wszystkie ukryte" przyciskiem, bo samo
+  automatyczne chowanie okazało się w niektórych ustawieniach kamery mylące.
 
 ## Świadomie pominięte
 
@@ -32,4 +39,13 @@ Prowadzone na bieżąco.
 
 ## Jak to sprawdzić
 
+Wejdź na widok poziomu, przełącz na widok 3D i obracaj kamerą (OrbitControls) —
+ściana najbliżej kamery, zasłaniająca wnętrze pokoju, znika. Przyciskiem obok
+przełącznika 2D/3D można wymusić „wszystkie widoczne" albo „wszystkie ukryte".
+
 ## Ryzyka
+
+Heurystyka najbliższego pokoju może dać błędną normalną dla ściany, która nie
+graniczy z żadnym pokojem wprost (np. ściana zewnętrzna przy pustym narożniku) —
+w takim wypadku ściana może pozostać widoczna albo zniknąć w niewłaściwym momencie.
+Niski koszt: tryb „bliskie ukryte" nie jest jedynym dostępnym trybem.
