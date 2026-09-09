@@ -13,7 +13,8 @@ którego jesteś właścicielem.
 Przeczytaj `.claude/rules/api.md`, `.claude/rules/contracts.md` i
 `.claude/rules/typescript.md` oraz `.claude/rules/stack.md`.
 Zasady testów — `.claude/rules/testing.md`. Jeśli zadanie dotyka danych — także `.claude/rules/data.md`,
-żeby wiedzieć, czego **nie** wolno Ci zmienić.
+żeby wiedzieć, czego **nie** wolno Ci zmienić. Jeśli zadanie dotyka logowania, sesji
+albo OAuth — także `.claude/rules/auth.md`, on uzupełnia `api.md`, nie zastępuje go.
 
 ## Kontrakt przed implementacją
 
