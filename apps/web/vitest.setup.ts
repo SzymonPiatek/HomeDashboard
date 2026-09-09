@@ -8,3 +8,12 @@ import { afterEach } from "vitest";
 afterEach(() => {
   cleanup();
 });
+
+// jsdom nie implementuje ResizeObserver — potrzebne przez pozycjonowanie w Radix
+// (np. AlertDialog, Tooltip).
+class ResizeObserverStub {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+globalThis.ResizeObserver ??= ResizeObserverStub;

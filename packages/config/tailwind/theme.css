@@ -27,6 +27,8 @@
     --border: oklch(0.65 0.01 50);
     --input: oklch(0.65 0.01 50);
     --ring: oklch(0.55 0.19 41);
+    /* Tło pod modalem — celowo bez odpowiednika w .dark, zawsze ciemne niezależnie od motywu. */
+    --overlay: oklch(0 0 0);
   }
 
   /* Wyniesienie warstw pokazujemy jaśniejszym tłem, nie cieniem — .claude/rules/web.md. */
@@ -86,4 +88,5 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
 }

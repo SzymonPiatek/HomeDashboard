@@ -20,6 +20,7 @@ Prowadzone na bieżąco.
 | 2026-09-09 | `plan/FloorPlanView2D.tsx` | Zaznaczanie ściany/pokoju w widoku 2D (klik oraz Tab, `aria-pressed`, podświetlenie kolorem akcentu) — pierwszy krok edytora, bez rysowania, przesuwania, usuwania ani zapisu. |
 | 2026-09-09 | `plan/FloorPlanView2D.tsx`, `plan/StaticFloorPlanView.tsx` (nowy), `plan/editor/**` (nowy), `plan/FloorPlanViewControls.tsx`, `LevelPlanPageView.tsx`, `api/use-floor-plan.ts`, `packages/contracts/src/floor-plan.ts` | Tryb edycji rzutu: przycisk (ikona `PencilRuler`, odróżniona od ołówka zmiany nazwy w nagłówku) obok przełącznika 2D/3D, widoczny tylko w 2D. Po włączeniu pokazuje pasek: narzędzie „Zaznacz” (na razie jedyne), „Zapisz rzut” (aktywny, gdy jest różnica względem zapisanej wersji), „Cofnij”/„Ponów”. Poza trybem edycji widok zostaje czysto wizualny (`StaticFloorPlanView`) z tym samym zaznaczaniem co dotąd. |
 | 2026-09-09 | `plan/editor/EditorToolbar.tsx`, `plan/editor/use-floor-plan-editor.ts` | Przycisk „Usuń zaznaczone” (kosz) w toolbarze, obok narzędzia „Zaznacz” — aktywny tylko gdy coś jest zaznaczone; ta sama akcja co dotąd pod klawiszem Delete/Backspace. |
+| 2026-09-09 | `components/ui/alert-dialog.tsx` (nowy), `components/ConfirmDeleteButton.tsx`, `LocationDetailPageView.tsx`, `LevelPlanPageView.tsx` | Potwierdzenie usunięcia lokalizacji/poziomu przeniesione z rozwijanego bloku obok kosza do modala (`@radix-ui/react-alert-dialog`) — mniej miejsca w nagłówku, ten sam wymóg jawnego potwierdzenia. Przyciski „Anuluj”/„Potwierdź” mają wymuszony jednakowy rozmiar (`h-11 w-28`). |
 
 ## Decyzje podjęte po drodze
 
@@ -31,6 +32,13 @@ Prowadzone na bieżąco.
   Zapis czyści oba stosy — nie da się cofnąć do stanu sprzed ostatniego zapisu.
 - Toolbar na razie ma tylko narzędzie „Zaznacz” — rysowanie ściany/pokoju wraca, gdy
   będzie gotowe.
+- Nowy token `--overlay` w `packages/config/tailwind/theme.css` — celowo bez wariantu
+  w `.dark`, bo tło pod modalem ma być ciemne niezależnie od motywu; surowy kolor
+  Tailwinda (`bg-black/50`) złamałby regułę `.claude/rules/web.md` o tokenach.
+- `AlertDialogAction`/`AlertDialogCancel` budują klasy jednym wywołaniem `buttonVariants()`
+  (jak `Button`), nie dwoma sklejonymi — dwa wywołania non-deterministycznie gubiły
+  `h-11`/szerokość w `tailwind-merge`, przez co przyciski „Anuluj”/„Potwierdź” wychodziły
+  różnej wielkości.
 
 ## Świadomie pominięte
 

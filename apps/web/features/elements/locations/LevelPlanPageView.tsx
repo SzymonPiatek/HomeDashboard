@@ -110,6 +110,7 @@ export function LevelPlanPageView() {
           <ConfirmDeleteButton
             itemLabel={`poziom „${level.name}”`}
             isPending={deleteLevel.isPending}
+            error={deleteLevel.isError ? deleteLevel.error.message : null}
             onConfirm={() =>
               deleteLevel.mutate(levelId, {
                 onSuccess: () => router.push(LOCATION_ROUTES.detail(locationId)),
@@ -118,11 +119,6 @@ export function LevelPlanPageView() {
           />
         </div>
       </div>
-      {deleteLevel.isError ? (
-        <p role="alert" className="text-sm text-destructive">
-          {deleteLevel.error.message}
-        </p>
-      ) : null}
 
       {plan.data.walls.length === 0 && plan.data.rooms.length === 0 ? (
         <p className="text-muted-foreground">
